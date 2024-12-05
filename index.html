@@ -64,7 +64,7 @@
             </ul>
         </section>
 
-        <section id="methodology">
+        <!-- <section id="methodology">
             <h2>Methodology</h2>
             <h3>Dataset and Models</h3>
             <ul>
@@ -90,7 +90,121 @@
                 control the sharpness of the alignment. This loss encourages the model to focus on meaningful
                 cross-modal relationships while maintaining scalability.
             </p>
+        </section> -->
+        <section id="methodology">
+            <h2>Methodology</h2>
+
+            <h3>Data Pipeline</h3>
+            <p>
+                The data pipeline processes paired image and text data from the Flickr30k dataset, preparing it for
+                input into our model.
+                This dataset is ideal for aligning visual and textual modalities due to its paired image-caption
+                structure.
+                Key stages of the pipeline include:
+            </p>
+            <ul>
+                <li> <strong>Image Processing:</strong> Images are resized to 224x224 pixels, normalized to match the
+                    preprocessing of ResNet-18,
+                    and converted to tensors for batch input. </li>
+                <li> <strong>Text Processing:</strong> Captions are tokenized using a BERT tokenizer, padded for uniform
+                    length,
+                    and converted to tensors. </li>
+                <li> <strong>Data Loading:</strong> Configured with a batch size of 64, the data loader shuffles,
+                    batches, and optimizes data for
+                    efficient GPU utilization. </li>
+            </ul>
+            <figure>
+                <img src="figures/data_pipeline.jpg" alt="Data Pipeline">
+                <figcaption>
+                    Illustration of the data pipeline: image and text processing leading to batched inputs for encoders.
+                </figcaption>
+            </figure>
+
+            <h3>Model Architecture</h3>
+            <p>
+                Our model leverages frozen pre-trained encoders for each modality, integrated with lightweight trainable
+                adapters to map features into a shared multimodal space.
+            </p>
+            <ul>
+                <li>
+                    <strong>Pre-trained Encoders:</strong> ResNet-18 extracts 512-dimensional image features, while
+                    DistilBERT generates 768-dimensional text embeddings.
+                </li>
+                <li>
+                    <strong>Linear Adapters:</strong> Trainable linear projections align features into a shared latent
+                    space of 768 dimensions. Adapter variations include:
+                    <ul>
+                        <li>Linear adapters (e.g., 512 → 768).</li>
+                        <li>MLP adapters (e.g., 512 → 1024 → 768).</li>
+                        <li>Bottleneck adapters (e.g., 512 → 256 → 768).</li>
+                    </ul>
+                </li>
+            </ul>
+            <figure>
+                <img src="figures/model_architecture.png" alt="Model Architecture">
+                <figcaption>Diagram of the model architecture: frozen encoders, adapters, and shared multimodal latent
+                    space.</figcaption>
+            </figure>
+
+            <h3>Training Procedure</h3>
+            <p>
+                The alignment process uses contrastive learning to minimize the distance between embeddings of matching
+                image-caption pairs while maximizing it for mismatched pairs.
+            </p>
+            <ol>
+                <li>
+                    <strong>Contrastive Loss:</strong> A temperature-scaled similarity metric determines the loss,
+                    ensuring meaningful alignment across modalities:
+                    <br>
+                    <code>
+                    L = - (1/N) Σ log(exp(similarity(x, y) / τ) / Σ exp(similarity(x, y')))
+                    </code>
+                </li>
+                <li>
+                    <strong>Training Loop:</strong> The pipeline processes batches through the encoders and adapters,
+                    computes gradients, and updates adapter parameters.
+                </li>
+                <li>
+                    <strong>Evaluation:</strong> Kernel alignment metrics measure the similarity between the learned
+                    multimodal representations and DinoV2 embeddings.
+                </li>
+            </ol>
+            <figure>
+                <img src="figures/training_loss_metrics.png" alt="Training Metrics">
+                <figcaption>Placeholder: Training loss and alignment metrics over epochs.</figcaption>
+            </figure>
+
+            <h3>Evaluation Metrics</h3>
+            <ul>
+                <li>
+                    <strong>Unimodal Kernel Similarity:</strong> Measures the initial similarity of image and text
+                    kernels to DinoV2.
+                </li>
+                <li>
+                    <strong>Aligned Kernel Similarity:</strong> Evaluates the final alignment of multimodal kernels with
+                    DinoV2 after training.
+                </li>
+            </ul>
+            <figure>
+                <img src="figures/kernel_heatmaps.png" alt="Kernel Similarity Heatmaps">
+                <figcaption>Heatmaps comparing the similarity of multimodal kernels with DinoV2 embeddings.</figcaption>
+            </figure>
+
+            <h3>Implementation Details</h3>
+            <ul>
+                <li><strong>Frameworks:</strong> PyTorch for modeling, Hugging Face Transformers for text encoding, and
+                    Weights & Biases for tracking experiments.</li>
+                <li><strong>Hyperparameters:</strong>
+                    <ul>
+                        <li>Batch size: 64</li>
+                        <li>Learning rate: 1e-4</li>
+                        <li>Temperature parameter: τ = 0.07</li>
+                        <li>Epochs: 50</li>
+                    </ul>
+                </li>
+            </ul>
         </section>
+
 
         <section id="initial-results">
             <h2>Initial Results</h2>
