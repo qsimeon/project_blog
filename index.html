@@ -64,36 +64,113 @@
             </ul>
         </section>
 
-        <!-- <section id="methodology">
-            <h2>Methodology</h2>
-            <h3>Dataset and Models</h3>
-            <ul>
-                <li><strong>Image Encoder:</strong> ResNet-18, pre-trained on ImageNet, provides feature vectors for
-                    images.</li>
-                <li><strong>Text Encoder:</strong> GPT-2, pre-trained for language tasks, processes captions into
-                    textual embeddings.</li>
-                <li><strong>Dataset:</strong> Flickr30k, a collection of image-caption pairs, serves as our primary
-                    dataset for aligning modalities.</li>
-                <li><strong>Performance Benchmark:</strong> DinoV2, a state-of-the-art vision model, serves as the
-                    target for kernel alignment comparisons.</li>
-            </ul>
-
-            <h3>Alignment Procedure</h3>
-            <p>
-                Representations from each modality are extracted using their respective encoders. Linear adapters map
-                these representations into a shared latent space. The alignment process is driven by contrastive
-                learning, which minimizes the distance between aligned embeddings of matching image-caption pairs while
-                maximizing the distance for unrelated pairs.
-            </p>
-            <p>
-                The training objective is formulated as a contrastive loss, incorporating a temperature parameter to
-                control the sharpness of the alignment. This loss encourages the model to focus on meaningful
-                cross-modal relationships while maintaining scalability.
-            </p>
-        </section> -->
         <section id="methodology">
             <h2>Methodology</h2>
 
+            <h3>Mathematical Framework</h3>
+            <p>
+                At the heart of our project is the hypothesis that the representation spaces of unimodal models can be
+                aligned into a shared multimodal latent space. This section formalizes the key mathematical elements
+                underpinning this approach.
+            </p>
+
+            <h4>Multimodal Data Representation</h4>
+            <p>
+                Let the world generate data across multiple modalities:
+            </p>
+            <code>
+                𝒟<sub>world</sub> = { (x<sup>(i)</sup>, y<sup>(i)</sup>) | i = 1, ..., N }
+            </code>
+            <p>
+                where <em>x</em> represents an instance in the image modality (<em>𝒳</em>), and <em>y</em> represents
+                an instance in the text modality (<em>𝒴</em>). For each modality, frozen pre-trained encoders are used
+                to extract representations:
+            </p>
+            <code>
+                X<sub>enc</sub>: 𝒳 → ℝ<sup>d<sub>x</sub></sup>, <br>
+                Y<sub>enc</sub>: 𝒴 → ℝ<sup>d<sub>y</sub></sup>
+            </code>
+            <p>
+                These functions map raw data into feature spaces ℝ<sup>d<sub>x</sub></sup> and
+                ℝ<sup>d<sub>y</sub></sup>, where <em>d<sub>x</sub></em> and <em>d<sub>y</sub></em> are the
+                dimensionalities of the image and text feature spaces, respectively.
+            </p>
+
+            <h4>Learned Adapters</h4>
+            <p>
+                To align representations into a shared latent space ℝ<sup>d<sub>e</sub></sup>, we introduce linear
+                adapters:
+            </p>
+            <code>
+                W<sub>x</sub>: ℝ<sup>d<sub>x</sub></sup> → ℝ<sup>d<sub>e</sub></sup>, <br>
+                W<sub>y</sub>: ℝ<sup>d<sub>y</sub></sup> → ℝ<sup>d<sub>e</sub></sup>
+            </code>
+            <p>
+                These adapters are the only trainable components of the system. Their weights are optimized to minimize
+                the distance between paired representations in the shared latent space and maximize the separation
+                between unpaired representations.
+            </p>
+
+            <h4>Contrastive Learning Objective</h4>
+            <p>
+                The contrastive loss function encourages the model to align matching pairs (x<sup>(i)</sup>,
+                y<sup>(i)</sup>) while pushing apart non-matching pairs:
+            </p>
+            <code>
+                ℒ = - (1/N) ∑<sub>i=1</sub><sup>N</sup> log (
+                    exp( ⟨W<sub>x</sub>X<sub>enc</sub>(x<sup>(i)</sup>), W<sub>y</sub>Y<sub>enc</sub>(y<sup>(i)</sup>)⟩ / τ ) /
+                    ∑<sub>j=1</sub><sup>N</sup> exp( ⟨W<sub>x</sub>X<sub>enc</sub>(x<sup>(i)</sup>), W<sub>y</sub>Y<sub>enc</sub>(y<sup>(j)</sup>)⟩ / τ )
+                )
+            </code>
+            <p>
+                Here, <em>τ</em> is a temperature parameter controlling the sharpness of similarity scores, and ⟨·,·⟩
+                denotes the cosine similarity between embeddings.
+            </p>
+
+            <h4>Kernel Alignment Metrics</h4>
+            <p>
+                To evaluate the learned multimodal representation, we define kernel functions for the unimodal encoders
+                and the aligned representations:
+            </p>
+            <ul>
+                <li>
+                    <strong>Unimodal Kernels:</strong> Pre-trained encoder kernels capture the similarity of instances
+                    within a modality:
+                    <code>
+                        K<sub>X</sub>(i, j) = ⟨X<sub>enc</sub>(x<sup>(i)</sup>), X<sub>enc</sub>(x<sup>(j)</sup>)⟩, <br>
+                        K<sub>Y</sub>(i, j) = ⟨Y<sub>enc</sub>(y<sup>(i)</sup>), Y<sub>enc</sub>(y<sup>(j)</sup>)⟩
+                    </code>
+                </li>
+                <li>
+                    <strong>Aligned Kernel:</strong> The kernel of the shared multimodal representation is:
+                    <code>
+                        K<sub>aligned</sub>(i, j) = ⟨r<sup>(i)</sup>, r<sup>(j)</sup>⟩, where r<sup>(i)</sup> = W<sub>x</sub>X<sub>enc</sub>(x<sup>(i)</sup>)
+                    </code>
+                </li>
+                <li>
+                    <strong>Performant Model Kernel:</strong> The kernel of a performant model (e.g., DinoV2) serves as
+                    a reference:
+                    <code>
+                        K<sub>DinoV2</sub>(i, j) = ⟨DinoV2(x<sup>(i)</sup>), DinoV2(x<sup>(j)</sup>)⟩
+                    </code>
+                </li>
+            </ul>
+            <p>
+                The kernel alignment metric compares the similarity between aligned multimodal kernels and the
+                performant model kernel:
+            </p>
+            <code>
+                m(K<sub>aligned</sub>, K<sub>DinoV2</sub>) > avg( m(K<sub>X</sub>, K<sub>DinoV2</sub>), m(K<sub>Y</sub>, K<sub>DinoV2</sub>) )
+            </code>
+
+            <h4>Key Hypothesis</h4>
+            <p>
+                We hypothesize that the learned aligned representation kernel achieves higher similarity with the
+                performant model kernel than the unimodal kernels, demonstrating the success of multimodal alignment and
+                the principles underlying representation convergence.
+            </p>
+
+            <!-- Include the remaining details from the previous "Methodology" writeup here -->
             <h3>Data Pipeline</h3>
             <p>
                 The data pipeline processes paired image and text data from the Flickr30k dataset, preparing it for
@@ -204,6 +281,12 @@
                 </li>
             </ul>
         </section>
+
+        <!-- <section id="methodology">
+            <h2>Methodology</h2>
+
+            
+        </section> -->
 
 
         <section id="initial-results">
