@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aligning Modalities: Unlocking Multimodal Representations</title>
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+    <header>
+        <h1>Aligning Modalities: Unlocking Multimodal Representations Without Large-Scale Training</h1>
+    </header>
+
+    <main>
+        <section id="introduction">
+            <h2>Introduction</h2>
+            <p>
+                Representation learning has revolutionized AI by enabling models to extract meaningful features from diverse data. However, training large-scale multimodal models requires extensive computational resources. This project explores an efficient alternative: aligning smaller, unimodal encoders into a shared multimodal representation space. We hypothesize that this approach can approximate the quality of performant models, like DinoV2, that operate closer to the "platonic representation" of reality.
+            </p>
+        </section>
+
+        <section id="hypothesis">
+            <h2>Hypothesis</h2>
+            <ul>
+                <li>Aligning embeddings from smaller unimodal models can approximate performant multimodal representations.</li>
+                <li>Efficient transformations (e.g., linear adapters) suffice to align modalities.</li>
+                <li>Adding more modalities improves alignment and representational quality.</li>
+            </ul>
+        </section>
+
+        <section id="related-work">
+            <h2>Related Work</h2>
+            <p>
+                This project builds on the <strong>Platonic Representation Hypothesis</strong> (Huh et al., 2024), which posits that performant models converge on a shared statistical model of reality. Additionally, techniques like linear stitching (Merullo et al., 2022) and multimodal alignment in models like LLaVA (Liu et al., 2023) inspired our approach.
+            </p>
+        </section>
+
+        <section id="initial-results">
+            <h2>Initial Results</h2>
+            <p>Our experiments with image and text modalities yielded the following insights:</p>
+            <ul>
+                <li>Aligned representations approximate DinoV2 embeddings, partially validating our hypothesis.</li>
+                <li>Cross-modality alignment improves text similarity to DinoV2, despite its lack of text training.</li>
+                <li>Smaller datasets achieve faster convergence and higher alignment scores.</li>
+            </ul>
+            <p><strong>Key Metrics:</strong></p>
+            <ul>
+                <li>Text-to-DinoV2 similarity: Low</li>
+                <li>Image-to-DinoV2 similarity: High</li>
+                <li>Aligned multimodal similarity: Intermediate (better than average unimodal similarity).</li>
+            </ul>
+        </section>
+
+        <section id="extensions">
+            <h2>Extensions</h2>
+            <h3>1. Downstream Task Evaluation</h3>
+            <p>
+                Replace DinoV2’s feature extractor with aligned multimodal representations and measure task performance degradation. Hypotheses:
+                <ul>
+                    <li>Performance degrades slightly but remains superior to random or untrained models.</li>
+                    <li>Aligned representations outperform unimodal representations.</li>
+                </ul>
+            </p>
+
+            <h3>2. Adding a Third Modality</h3>
+            <p>
+                Integrate audio (via Wav2Vec) to test whether adding modalities improves alignment and achieves <strong>"the whole is greater than the sum of its parts"</strong>:
+                <pre>max{image, text} < aligned multimodal</pre>
+            </p>
+        </section>
+
+        <section id="visualizations">
+            <h2>Proposed Visualizations</h2>
+            <ol>
+                <li>
+                    <strong>Kernel Alignment Over Epochs:</strong> Line plots showing alignment metrics across epochs.
+                    <p><em>Filename:</em> <code>figures/kernel_alignment_epochs.png</code></p>
+                </li>
+                <li>
+                    <strong>Kernel Heatmaps:</strong> Visualize similarity matrices for text, image, multimodal, and DinoV2 kernels.
+                    <p><em>Filename:</em> <code>figures/kernel_heatmaps.png</code></p>
+                </li>
+                <li>
+                    <strong>Representation PCA:</strong> Plot PCA of encoder outputs with semantic categories highlighted.
+                    <p><em>Filename:</em> <code>figures/representation_pca.png</code></p>
+                </li>
+                <li>
+                    <strong>Adapter Comparison:</strong> Bar charts comparing training loss and alignment scores for adapter types.
+                    <p><em>Filename:</em> <code>figures/adapter_comparison.png</code></p>
+                </li>
+                <li>
+                    <strong>Training Convergence:</strong> Loss and metric plots for varying configurations.
+                    <p><em>Filename:</em> <code>figures/training_convergence.png</code></p>
+                </li>
+                <li>
+                    <strong>Conceptual Diagram:</strong> Illustration of the multimodal alignment process.
+                    <p><em>Filename:</em> <code>figures/conceptual_diagram.png</code></p>
+                </li>
+            </ol>
+        </section>
+
+        <section id="future-directions">
+            <h2>Future Directions</h2>
+            <ul>
+                <li>Scale to larger multimodal datasets.</li>
+                <li>Benchmark against advanced models like CLIP.</li>
+                <li>Study downstream performance and cross-architecture transferability.</li>
+            </ul>
+        </section>
+
+        <section id="takeaways">
+            <h2>Takeaways</h2>
+            <p>
+                This project demonstrates the potential of aligning smaller encoders for efficient multimodal representation learning. Our results highlight both the promise and the limitations of this approach, paving the way for further exploration in multimodal AI.
+            </p>
+        </section>
+    </main>
+
+    <footer>
+        <p>Multimodal Alignment Analysis | Project Blog | November 2024</p>
+    </footer>
+</body>
+</html>
