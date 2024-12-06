@@ -1,0 +1,54 @@
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="800" height="500" fill="white"/>
+    
+    <!-- Input Modalities -->
+    <!-- Image Input -->
+    <rect x="50" y="50" width="120" height="100" rx="10" fill="#E3F2FD" stroke="#1976D2" stroke-width="2"/>
+    <text x="110" y="105" font-family="Arial" font-size="16" text-anchor="middle" fill="#1976D2">Image</text>
+    
+    <!-- Text Input -->
+    <rect x="340" y="50" width="120" height="100" rx="10" fill="#E8F5E9" stroke="#388E3C" stroke-width="2"/>
+    <text x="400" y="105" font-family="Arial" font-size="16" text-anchor="middle" fill="#388E3C">Text</text>
+    
+    <!-- Audio Input -->
+    <rect x="630" y="50" width="120" height="100" rx="10" fill="#FFF3E0" stroke="#F57C00" stroke-width="2"/>
+    <text x="690" y="105" font-family="Arial" font-size="16" text-anchor="middle" fill="#F57C00">Audio</text>
+
+    <!-- Encoders -->
+    <rect x="50" y="200" width="120" height="60" rx="5" fill="#BBDEFB" stroke="#1976D2" stroke-width="2"/>
+    <text x="110" y="235" font-family="Arial" font-size="14" text-anchor="middle">Vision Encoder</text>
+    
+    <rect x="340" y="200" width="120" height="60" rx="5" fill="#C8E6C9" stroke="#388E3C" stroke-width="2"/>
+    <text x="400" y="235" font-family="Arial" font-size="14" text-anchor="middle">Text Encoder</text>
+    
+    <rect x="630" y="200" width="120" height="60" rx="5" fill="#FFE0B2" stroke="#F57C00" stroke-width="2"/>
+    <text x="690" y="235" font-family="Arial" font-size="14" text-anchor="middle">Audio Encoder</text>
+
+    <!-- Alignment Layer -->
+    <path d="M 200 350 Q 400 300 600 350" fill="none" stroke="#9E9E9E" stroke-width="2" stroke-dasharray="5,5"/>
+    <rect x="250" y="320" width="300" height="60" rx="30" fill="#F5F5F5" stroke="#616161" stroke-width="2"/>
+    <text x="400" y="355" font-family="Arial" font-size="16" text-anchor="middle">Shared Embedding Space</text>
+
+    <!-- Connecting Lines -->
+    <!-- Image path -->
+    <line x1="110" y1="150" x2="110" y2="200" stroke="#1976D2" stroke-width="2"/>
+    <line x1="110" y1="260" x2="110" y2="350" stroke="#1976D2" stroke-width="2"/>
+    <text x="140" y="290" font-family="Arial" font-size="12" fill="#1976D2">2048d</text>
+    
+    <!-- Text path -->
+    <line x1="400" y1="150" x2="400" y2="200" stroke="#388E3C" stroke-width="2"/>
+    <line x1="400" y1="260" x2="400" y2="320" stroke="#388E3C" stroke-width="2"/>
+    <text x="430" y="290" font-family="Arial" font-size="12" fill="#388E3C">768d</text>
+    
+    <!-- Audio path -->
+    <line x1="690" y1="150" x2="690" y2="200" stroke="#F57C00" stroke-width="2"/>
+    <line x1="690" y1="260" x2="690" y2="350" stroke="#F57C00" stroke-width="2"/>
+    <text x="720" y="290" font-family="Arial" font-size="12" fill="#F57C00">512d</text>
+
+    <!-- Output Dimension -->
+    <text x="400" y="400" font-family="Arial" font-size="14" text-anchor="middle" fill="#616161">Aligned 384d Representations</text>
+
+    <!-- Title -->
+    <text x="400" y="30" font-family="Arial" font-size="20" font-weight="bold" text-anchor="middle">Multimodal Alignment Process</text>
+</svg>
