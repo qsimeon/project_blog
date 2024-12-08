@@ -226,8 +226,15 @@
             <p>
                 where \( \tau \) is a temperature parameter that scales the similarity scores.
             </p>
-            Intuitively, the contrastive loss function encourages the model to align matching pairs $(x(i), y(i))$ while
-            pushing apart non-matching pairs.
+            Intuitively, the contrastive loss function encourages the model to align matching pairs \( (x(i), y(i)) \)
+            while
+            pushing apart non-matching pairs. This process is illustrated in Figure 3. In the limit of training, we
+            expect
+            that the embeddings produced by both functions \( f_{\text{img}} \) and \( g_{\text{text}} \) will converge
+            to
+            the same representation in the shared latent space. We refer to this representation intercahngeably as the
+            aligned
+            or multimodal representation (or both simultaneously i.e. the aligned multimodal representation).
             <img src="figures/conceptual_contrastive.svg" , alt="Aligning Image Text Dataset Flickr30k">
             <figcaption>
                 <strong>Figure 3.</strong> Conceptual illustration of contrastive learning: aligning image and text
@@ -288,7 +295,7 @@
                 </p>
                 <p>
                     \[
-                    m(K_X, K_{\text{DinoV2}}), \quad m(K_Y, K_{\text{DinoV2}}).
+                    m(K_X, K_{\text{DinoV2}}), \quad m(K_Y, K_{\text{DinoV2}})
                     \]
                 </p>
 
@@ -299,7 +306,7 @@
                 </p>
                 <p>
                     \[
-                    m(K_{\text{repr}}, K_{\text{DinoV2}}).
+                    m(K_{\text{repr}}, K_{\text{DinoV2}})
                     \]
                 </p>
 
@@ -312,7 +319,7 @@
                 <p>
                     \[
                     m(K_{\text{repr}}, K_{\text{DinoV2}}) > \text{avg}\big(m(K_X, K_{\text{DinoV2}}), m(K_Y,
-                    K_{\text{DinoV2}})\big).
+                    K_{\text{DinoV2}})\big)
                     \]
                 </p>
                 <p>
@@ -329,7 +336,7 @@
                 <p>
                     \[
                     m(K_{\text{repr}}, K_{\text{DinoV2}}) > \max\big(m(K_X, K_{\text{DinoV2}}), m(K_Y,
-                    K_{\text{DinoV2}})\big).
+                    K_{\text{DinoV2}})\big)
                     \]
                 </p>
                 <p>
@@ -412,7 +419,8 @@
             <ul>
                 <li><strong>Unimodal Kernel Similarity:</strong> Baseline similarity of ResNet-18 and DistilBERT
                     representations to DINOv2 embeddings.</li>
-                <li><strong>Aligned Kernel Similarity:</strong> Final similarity of the multimodal representations to
+                <li><strong>Aligned Kernel Similarity:</strong> Final similarity of the aligned/multimodal
+                    representations to
                     DINOv2 embeddings.</li>
             </ul>
             <figure>
@@ -424,7 +432,7 @@
             <h3>Implementation Details</h3>
             <p>
                 All code we used for this project is implemented in this <a
-                    href="https://colab.research.google.com/drive/1tguG-THn52pPGcU9KIkmVBzYbhiPfw1w?usp=sharing">Google
+                    href="https://colab.research.google.com/drive/1BkyPko0x-8CL41Z-VSmyxI41B90hB2Fc?usp=sharing">Google
                     Colab notebook</a>.
             </p>
             <ul>
@@ -487,18 +495,24 @@
                     <figcaption>Linear Adapter</figcaption>
                 </figure>
             </div>
+            <p>
+                The bar plot in Figure 5 visually summarizes the kernel alignment metrics before and after training the
+                adapters.
+                We can immediately inspect whether our hypotheses stated in the Mathematical Framework section are
+                supported or not.
+            </p>
             <figure>
-                <!-- TODO: Create a barplot comparing the kernel alignement metric before and after training.
-                The top subplot is for the linear adapter. The bottom suplot is for the MLP adapter.
-                Each suplplot will have two x-ticks (before training and after training) and each xtick has three bars: 
-                    one for the image modality, one for the text modality, and one for the aligned multimodal representation.
-                The y-axis is the kernel alignment metric value (i.e. \(m\) which for us is the mutual-KNN). 
-                This bar plot will be allow us to immediately visually test our key hypotheses from the mathematical framework section. -->
                 <img src="figures/bar_plot_sketch.jpg" alt="Kernel Alignment Metric Before and After Trainign">
-                <figcaption>Placeholder: Bar plot showing kernel alignment for text, image, and multimodal embeddings
+                <figcaption><strong>Figure 5.</strong>Placeholder: Bar plot showing kernel alignment for text, image,
+                    and multimodal embeddings
                     before and after training adapters to align unimodal representations into a latent multimodal
-                    represntation
-                    using contrastive loss.</figcaption>
+                    representation using contrastive loss. The top subplot is for the linear adapter. The bottom suplot
+                    is for the MLP adapter.
+                    Each suplplot shows bars for before and after training of the adapters for the image (hacthed bars)
+                    and text (solid bars) modalities.
+                    The y-axis is the mutual-kNN kernel alignment metric \(m\) between the modality embedding and the
+                    DinoV2 embedding
+                    (which we assume approximates the Platonic representation).</figcaption>
             </figure>
         </section>
 
@@ -546,6 +560,93 @@
                 representations across modalities.
             </p>
         </section>
+
+        <section id="discussion">
+            <h2>Discussion</h2>
+            <p>
+                In this project, we build upon a central premise of the Platonic Representation Hypothesis (PRH)
+                proposed by Huh et al. (2024): the idea that the representations learned by performant models converge
+                toward an idealized, universal representation of the world — a <strong>Platonic representation</strong>.
+                We take this hypothesis as a starting point and assume that the representations produced by
+                <strong>DinoV2</strong> serve as a reasonable approximation of this Platonic representation.
+            </p>
+
+            <p>
+                Our primary conjecture is that one mechanism to achieve this Platonic representation is through the
+                alignment of representations from different modalities into a shared latent space. Specifically, by
+                using contrastive learning to align representations from <strong>pre-trained image and text
+                    encoders</strong> (ResNet-18 and DistilBERT), we hypothesize that the resulting multimodal
+                representation can approximate the Platonic representation more closely than either of the unimodal
+                representations alone.
+            </p>
+
+            <h3>Driving Convergence via Alignment</h3>
+            <p>
+                The PRH suggests that convergence of representations occurs naturally due to factors such as:
+            </p>
+            <ul>
+                <li>Training on diverse, multi-task datasets.</li>
+                <li>Increasingly performant and large-scale model architectures.</li>
+                <li>Utilization of multimodal data during training.</li>
+            </ul>
+            <p>
+                Our work extends this hypothesis by proposing an <strong>explicit algorithmic mechanism</strong> for
+                driving representational convergence: aligning pre-trained unimodal representations using
+                <strong>contrastive learning</strong>. Instead of relying on joint training of large multimodal models,
+                our approach demonstrates that:
+            </p>
+            <ul>
+                <li>Lightweight linear and MLP adapters can effectively align frozen unimodal encoders.</li>
+                <li>Contrastive alignment in a shared latent space can achieve meaningful convergence toward the
+                    Platonic representation.</li>
+            </ul>
+
+            <p>
+                This approach offers a more efficient alternative to end-to-end multimodal training. By aligning
+                representations post hoc, we enable <strong>modular scalability</strong>, where new modalities can be
+                incorporated without retraining the entire model.
+            </p>
+
+            <h3>Empirical Insights</h3>
+            <p>
+                Our results provide partial validation of our hypotheses. Specifically, we observed that the
+                <strong>aligned multimodal representations</strong> exhibit:
+            </p>
+            <ul>
+                <li><strong>Improved Similarity</strong> to DinoV2 embeddings compared to the average of unimodal
+                    representations.</li>
+                <li>A <strong>Cross-Modality Benefit</strong> where text representations, which DinoV2 was not trained
+                    to process, became more similar to the image representations.</li>
+            </ul>
+            <p>
+                However, the aligned multimodal representation did not surpass the best-performing unimodal
+                representation (the image modality) in terms of kernel alignment. This caveat suggests that while
+                alignment can drive convergence, there may still be modality-specific factors that influence the quality
+                of representations.
+            </p>
+
+            <h3>Implications and Future Directions</h3>
+            <p>
+                Our findings suggest that multimodal alignment via contrastive learning is a promising direction for
+                achieving efficient and scalable multimodal representation learning. This work also opens up several
+                avenues for further research:
+            </p>
+            <ul>
+                <li><strong>Incorporating Additional Modalities:</strong> Expanding the framework to include audio,
+                    video, or graph data could further test the robustness of the alignment mechanism.</li>
+                <li><strong>Downstream Task Evaluation:</strong> Assessing the utility of aligned representations on
+                    tasks like visual question answering, retrieval, or classification.</li>
+                <li><strong>Mechanistic Analysis:</strong> Investigating the internal mechanisms of convergence and how
+                    specific adapter architectures influence the alignment process.</li>
+            </ul>
+
+            <p>
+                Ultimately, this work supports the broader goal of understanding how different modalities can be
+                integrated to form a cohesive, universal representation of the world — a pursuit that lies at the heart
+                of the Platonic Representation Hypothesis.
+            </p>
+        </section>
+
     </main>
 
     <footer>
@@ -592,30 +693,3 @@
 </style>
 
 </html>
-
-<!-- # TODO: Make an Appendix section and put this there. -->
-<!-- <h4>Mutual \( k \)-Nearest Neighbor Metric</h4>
-<ol>
-    <li>
-        <strong>Feature Extraction:</strong> From a batch of paired samples \( \{ (x_i, y_i) \}_{i=1}^N \), extract their features:
-        \[
-        \phi_i = f(x_i), \quad \psi_i = g(y_i).
-        \]
-        Here, \( \phi_i \) and \( \psi_i \) are feature vectors for modalities \( x \) and \( y \), respectively.
-    </li>
-    <li>
-        <strong>Compute \( k \)-Nearest Neighbors:</strong>
-        For each feature \( \phi_i \) in batch \( \Phi \) and each \( \psi_i \) in batch \( \Psi \), compute the indices of their \( k \)-nearest neighbors:
-        \[
-        d_{\text{knn}}(\phi_i, \Phi) = S(\phi_i), \quad d_{\text{knn}}(\psi_i, \Psi) = S(\psi_i),
-        \]
-        where \( S(\phi_i) \) and \( S(\psi_i) \) represent the sets of indices of their \( k \)-nearest neighbors.
-    </li>
-    <li>
-        <strong>Mutual-KNN Alignment:</strong> Measure the average intersection of nearest neighbor sets between the two modalities:
-        \[
-        m_{\text{NN}}(\phi_i, \psi_i) = \frac{1}{k} \left| S(\phi_i) \cap S(\psi_i) \right|.
-        \]
-        The final metric is the mean of \( m_{\text{NN}} \) values across all sample pairs.
-    </li>
-</ol> -->
