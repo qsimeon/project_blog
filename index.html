@@ -43,11 +43,16 @@
                 retraining these large models, enabling scalability to new modalities with minimal overhead.
             </p>
             <figure>
-                <img src="figures/img_txt_concept.svg" alt="Multimodal Alignment Process">
-                <figcaption><strong>Figure 1.</strong> Diagram illustrating multimodal alignment across 2 modalities
-                    (image and text).
+                <img src="figures/img_txt_concept.svg" alt="Multimodal Alignment Architecture">
+                <figcaption>
+                    <strong>Figure 1.</strong> Conceptual illustration of our multimodal alignment framework. Image and
+                    text representations
+                    from pre-trained encoders are aligned into a shared latent space using learned adapters. The
+                    dimension
+                    of the latent space set to that of the performant model (DinoV2) for comparison.
                 </figcaption>
             </figure>
+
 
             <h3>Motivation</h3>
             <p>
@@ -126,9 +131,9 @@
         <section id="mathematical-framework">
             <h2>Mathematical Framework</h2>
             <p>
-                At the heart of our project is the hypothesis that pre-trained unimodal representations can be aligned
-                into a shared multimodal latent space. This section formalizes the underlying mathematical structure of
-                our framework, detailing how representations are extracted, aligned, and evaluated.
+                At the core of our project is the hypothesis that pre-trained unimodal representations can be aligned
+                into a shared multimodal latent space. This section formalizes the mathematical structure underlying our
+                framework, detailing how representations are extracted, aligned, and evaluated.
             </p>
 
             <h3>Multimodal Data Representation</h3>
@@ -138,296 +143,268 @@
             <p>
                 \[
                 \mathcal{D}_\text{world} = \left\{\left(\theta^{(i)}, \psi^{(i)}, \phi^{(i)}, \dots \right)
-                \right\}_{i=1}^N, \quad
-                \theta \in \mathcal{\Theta}, \psi \in \mathcal{\Psi}, \phi \in \mathcal{\Phi}, \dots
+                \right\}_{i=1}^N, \quad \theta \in \mathcal{\Theta}, \psi \in \mathcal{\Psi}, \phi \in \mathcal{\Phi},
+                \dots
                 \]
             </p>
             <p>
-                where \( \{ \mathcal{\Theta}, \mathcal{\Psi}, \mathcal{\Phi}, \dots \} \) represent different modalities
-                (e.g., image,
-                text,
-                audio, ...), and \( \{ \theta, \psi, \phi, \dots \} \) are specific instances of the corresponding
-                modalities.
+                where \( \mathcal{\Theta}, \mathcal{\Psi}, \mathcal{\Phi} \) represent different modalities (e.g.,
+                image, text, audio), and \( \theta, \psi, \phi \) are specific instances of these modalities.
             </p>
             <p>
-                For simplicity, we focus in this project on a two-modality world with image and text data:
+                For simplicity, we focus on a two-modality setting with images (\( \mathcal{X} \)) and text (\(
+                \mathcal{Y} \)):
             </p>
             <p>
                 \[
-                \mathcal{D}_\text{world} = \left\{\left(x^{(i)}, y^{(i)}\right) \right\}_{i=1}^N, \quad x \in
-                \mathcal{X}, y \in \mathcal{Y}
+                \mathcal{D}_\text{world} = \left\{\left(x^{(i)}, y^{(i)}\right)\right\}_{i=1}^N, \quad x \in
+                \mathcal{X}, y \in \mathcal{Y}.
                 \]
             </p>
-            <p>
-                where \(\mathcal{X}\) is the image modality and \(\mathcal{Y}\) is the text modality.
-            </p>
-            <img src="figures/platonic_representation.svg" , alt="Platonic Representation Hypothesis">
-            <figcaption>
-                <strong>Figure 2.</strong> Apapted from the blog post of <a href="https://phillipi.github.io/prh/">The
-                    Platonic Representation Hypothesis (PRH)</a> by <a href="https://arxiv.org/abs/2405.07987 ">Huh et
-                    al. (2024)</a>. The PRH conjectures that representations learned on each modality on its own will
-                converge to
-                a similar representation and the limit this convergence is the Platonic representation. We posit that we
-                can drive this convergence by aligning representations of different modalities into a shared latent
-                space via constrastve learning.
-            </figcaption>
+            <figure>
+                <img src="figures/platonic_representation.svg" alt="Platonic Representation Hypothesis">
+                <figcaption>
+                    <strong>Figure 2.</strong> The Platonic Representation Hypothesis (Huh et al., 2024) suggests that
+                    representations from different modalities converge to a shared Platonic representation. We
+                    hypothesize that contrastive learning can actively drive this convergence by aligning
+                    representations from different modalities into a shared latent space.
+                </figcaption>
+            </figure>
 
             <h3>Learned Adapters</h3>
             <p>
-                For each modality, we use frozen pre-trained encoders to extract representations:
+                We use frozen pre-trained encoders to extract representations from each modality:
             </p>
             <p>
                 \[
-                X_\text{enc}: \mathcal{X} \rightarrow \mathbb{R}^{d_x}, \quad
-                Y_\text{enc}: \mathcal{Y} \rightarrow \mathbb{R}^{d_y} \quad
+                X_\text{enc}: \mathcal{X} \rightarrow \mathbb{R}^{d_x}, \quad Y_\text{enc}: \mathcal{Y} \rightarrow
+                \mathbb{R}^{d_y},
                 \]
             </p>
             <p>
-                where \( d_x, d_y \) are the embedding dimensions of the image and text inputs, respectively.
+                where \( d_x \) and \( d_y \) are the embedding dimensions for images and text, respectively.
             </p>
             <p>
-                To align these representations into a shared multimodal latent space \( \mathbb{R}^{d_e} \), we
-                introduce learned
+                To project these representations into a shared latent space \( \mathbb{R}^{d_e} \), we introduce learned
                 adapters:
             </p>
             <p>
                 \[
-                W_x : \mathbb{R}^{d_x} \rightarrow \mathbb{R}^{d_e}, \quad
-                W_y : \mathbb{R}^{d_y} \rightarrow \mathbb{R}^{d_e} \quad
+                W_x : \mathbb{R}^{d_x} \rightarrow \mathbb{R}^{d_e}, \quad W_y : \mathbb{R}^{d_y} \rightarrow
+                \mathbb{R}^{d_e}.
                 \]
             </p>
             <p>
-                We experiment with the adapters \( W_x, W_y\) being either linear trasnformations or simple 2-layer
-                multi-layer perceptron (MLP).
-            </p>
-            <p>
-                where \( d_e \) is the dimensionality of the shared latent space.
-                The compositions of the frozen encoders and corresponding adapters produces new encoders which we call
-                \(
-                f_\text{img}, g_\text{text} \) to match the notation used in the <a
-                    href="https://phillipi.github.io/prh/">PRH blog</a>.
-            </p>
-            <p>
-                We define the adapted encoders as follows:
+                We explore both <strong>linear adapters</strong> and <strong>2-layer MLP adapters</strong>. The adapted
+                encoders are:
             </p>
             <p>
                 \[
-                \begin{aligned}
-                f_\text{img}&: \mathcal{X} \rightarrow \mathbb{R}^{d_e}, \quad f_\text{img} := W_x \circ
-                X_\text{enc} \\
-                g_\text{text}&: \mathcal{Y} \rightarrow \mathbb{R}^{d_e}, \quad g_\text{text} := W_y \circ
-                Y_\text{enc}
-                \end{aligned}
+                f_\text{img} = W_x \circ X_\text{enc}, \quad g_\text{text} = W_y \circ Y_\text{enc},
                 \]
             </p>
             <p>
-                These functions map images and text into the shared latent space \( \mathbb{R}^{d_e} \).
+                which map images and text to the shared latent space \( \mathbb{R}^{d_e} \).
             </p>
 
             <h3>Dual-Encoder Contrastive Objective</h3>
             <p>
-                Inspired by the <strong>dual-encoder contrastive loss</strong> from Homework 4 and the <a
-                    href="https://phillipi.github.io/prh/"><strong>PRH</strong></a>, we aim to align representations
-                such that \( f_{\text {img
-                }}\left(x^{(i)}\right)$ and $g_{\text
-                {text }}\left(y^{(i)}\right) \) are close in the shared space. The objective function is:
+                To align the representations, we use a <strong>dual-encoder contrastive loss</strong>, inspired by the
+                formulation in <a href="https://phillipi.github.io/prh/">PRH</a> and Homework 4.
+            </p>
+            <!-- <figure>
+                <img src="figures/homework4_contrastive.jpg" alt="Dual-Encoder Contrastive Loss">
+            </figure> -->
+            <figure>
+                <img src="figures/conceptual_contrastive.svg" alt="Conceptual Multimodal Alignment">
+                <figcaption>
+                    <strong>Figure 3.</strong> Matching image-text pairs from the Flickr30k dataset are contrastively
+                    aligned in
+                    the latent space, while non-matching pairs are pushed apart. The aim is to approximate the Platonic
+                    representations, which we use the embeddings of a performatn model (DinoV2) as a proxy for.
+                </figcaption>
+            </figure>
+
+            <p>
+                The loss encourages
+                representations from matching pairs to be similar while pushing apart representations from non-matching
+                pairs:
             </p>
             <p>
                 \[
-                \mathcal{L}_{\text {contrastive }}=-\frac{1}{N} \sum_{i=1}^N \log \frac{\exp \left(f_{\text {img
-                }}\left(x^{(i)}\right) \cdot g_{\text {text }}\left(y^{(i)}\right) / \tau\right)}{\sum_{j=1}^N \exp
-                \left(f_{\text {img }}\left(x^{(i)}\right) \cdot g_{\text {text }}\left(y^{(j)}\right) / \tau\right)}
+                \mathcal{L}_{\text{contrastive}} = -\frac{1}{N} \sum_{i=1}^N \log \frac{\exp\left(f_\text{img}(x^{(i)})
+                \cdot g_\text{text}(y^{(i)}) / \tau\right)}{\sum_{j=1}^N \exp\left(f_\text{img}(x^{(i)}) \cdot
+                g_\text{text}(y^{(j)}) / \tau\right)},
                 \]
             </p>
-
             <p>
-                where \( \cdot \) is the dot product and \( \tau \) is a temperature scaling parameter.
+                where \( \tau \) is the temperature parameter that scales the similarity scores.
             </p>
-            <p>
-                This objective encourages matching pairs $\left(x^{(i)}, y^{(i)}\right)$ to have high similarity, while
-                mismatched pairs $\left(x^{(i)}, y^{(j)}\right), j \neq i$ are pushed apart.
-            </p>
-            <img src="figures/homework4_contrastive.jpg" , alt="Dual Encoder Constrastve Loss">
-            <figcaption>
-                <strong>Figure 3.</strong> Adapted from Homework 4.
-                <!-- # TODO: give better caption. -->
-            </figcaption>
-
-            <p>
-                Intuitively, this contrastive loss encourages the adapters to map matching pairs \( (x(i), y(i)) \)
-                to the same embedding vector in the latent space pushing apart the embedding vectors for non-matching
-                pairs \(
-                (x(i), y(j)), j \neq i \).
-                This process is illustrated in Figure 3. We refer to the embedding vectors in the shared latent space as
-                the aligned and/or multimodal representations.
-            </p>
-            <img src="figures/conceptual_contrastive.svg" , alt="Aligning Image Text Dataset Flickr30k">
-            <figcaption>
-                <strong>Figure 3.</strong> Conceptual illustration of contrastive learning: aligning image and text
-                representations from the Flickr30k dataset.
-            </figcaption>
 
 
             <h3>Interpretation and Connection to PRH</h3>
             <p>
-                The <strong>Platonic Representation Hypothesis</strong> posits that representations from different
-                modalities will converge towards a shared "Platonic" representation. In the context of our framework:
-            <ul>
-                <li>We hypothesize that <strong>contrastive alignment</strong> between \( f_{\text {img }} \) and \(
-                    g_{\text
-                    {text }} \) can drive this convergence towards the Platonic representation.</li>
-                <li>In the limit of perfect contrastive alignment (minimum diameter, max margin), \( f_{\text {img }}(x)
-                    \)
-                    and \( g_{\text {text }}(y) \) would ideally map to the <strong>same vector </strong> in the shared
-                    latent space. Our thesis is that this theoretical limiting vector is precisely the Platonic
-                    representation.</li>
-            </ul>
+                The <strong>Platonic Representation Hypothesis (PRH)</strong> posits that representations from different
+                modalities converge toward a shared "Platonic" representation. In our framework, we hypothesize that
+                <strong>contrastive alignment</strong> between the image encoder \( f_{\text{img}} \) and the text
+                encoder \( g_{\text{text}} \) can drive this convergence toward the Platonic representation.
             </p>
 
+            <p>
+                In the ideal case of perfect contrastive alignment (achieved by minimizing the diameter and maximizing
+                the margin), the outputs of \( f_{\text{img}}(x) \) and \( g_{\text{text}}(y) \) for matching pairs
+                would map to the <strong>same vector</strong> in the shared latent space:
+            </p>
 
             <p>
-                Due to finite data and model limitations, \(f_{\text {img }}(x)\) and \(g_{\text {text }}(y)\) are
-                typically <strong>close</strong> (as measured by \( L_2 \)-distance on \( \mathbb{S}^{d_e-1} \))
-                <strong>but not identical</strong> . Thus, we consider two options for the aligned multimodal
-                representation:
+                \[
+                f_{\text{img}}(x^{(i)}) = g_{\text{text}}(y^{(i)}).
+                \]
+            </p>
+
+            <p>
+                Our thesis is that this limiting vector represents the Platonic representation. However, in practice,
+                due to finite data, model capacity, and noise, the outputs of \( f_{\text{img}} \) and \(
+                g_{\text{text}} \) are typically <strong>close</strong> (as measured by the \( L_2
+                \)-distance on the unit hypersphere \( \mathbb{S}^{d_e-1} \)) but not identical.
+            </p>
+
+            <p>
+                Given this, we propose two strategies for obtaining the aligned multimodal representation \( r^{(i)} \):
+            </p>
+
             <ol>
-                <li><strong>Select</strong> the encoder (image or text) that produces the embedding closer to the
-                    performant model's
-                    embedding (e.g., DinoV2):
-                    <!-- TODO: use \cases to write this. -->
+                <li>
+                    <strong>Selection:</strong> Choose the representation that is closer to the performant model's
+                    representation (e.g., DinoV2):
                     <p>
                         \[
-                        r^{(i)} = f_{\text {img }}(x^{(i)}) \text{ if} \operatorname{sim}\left( f_{\text {img
-                        }}(x^{(i)}), \text{DinoV2}(x^{(i)}) \right) > \operatorname{sim}\left( g_{\text {text
-                        }}(y^{(i)}), \text{DinoV2}(x^{(i)}) \right), \text { otherwise }
-                        r^{(i)} = g_{\text{text }}(y^{(i)})
+                        r^{(i)} =
+                        \begin{cases}
+                        f_{\text{img}}(x^{(i)}) & \text{if } \operatorname{sim}(f_{\text{img}}(x^{(i)}),
+                        \text{DinoV2}(x^{(i)})) > \operatorname{sim}(g_{\text{text}}(y^{(i)}), \text{DinoV2}(x^{(i)}))
+                        \\
+                        g_{\text{text}}(y^{(i)}) & \text{otherwise}.
+                        \end{cases}
                         \]
                     </p>
                 </li>
-                <li><strong>Average</strong> the embeddings:
+                <li>
+                    <strong>Averaging:</strong> Take the average of the image and text embeddings:
                     <p>
-                        \[ r^{(i)}=\frac{1}{2}\left(f_{\text {img
-                        }}\left(x^{(i)}\right)+g_{\text
-                        {text }}\left(y^{(i)}\right)\right)
+                        \[
+                        r^{(i)} = \frac{1}{2} \left(f_{\text{img}}(x^{(i)}) + g_{\text{text}}(y^{(i)})\right).
                         \]
                     </p>
                 </li>
             </ol>
-            </p>
+
             <p>
-                We claim that this aligned multimodal representation is an <strong>approximation</strong> of the
-                Platonic
-                representation. Now we don't actually know what the Platonic representation is, but we assume /take for
-                granted the
-                conjecture of the PRH that the representations of perfomant models are converging towards it. So we
-                treat
-                performant model's representation (e.g., DinoV2) as a proxy for the Platonic representation. We evaluate
-                the quality of
-                the aligned multimodal representation by comparing it to the performant model's representation using a
-                kernel alignment metric.
+                We claim that this aligned multimodal representation \( r^{(i)} \) is an <strong>approximation</strong>
+                of the Platonic representation. While the true Platonic representation is unknown, we follow the PRH
+                conjecture that performant models like DinoV2 produce representations that are converging toward it.
+                Therefore, we use DinoV2’s representation as a <strong>proxy</strong> for the Platonic representation.
             </p>
 
+            <p>
+                We evaluate the quality of the aligned multimodal representation \( r^{(i)} \) by comparing it to the
+                DinoV2 representation using a kernel alignment metric.
+            </p>
 
-            <h3>Kernel Alignment Metric</h4>
-                <p>
-                    We characterize representations in terms of their <strong>kernels</strong>. Kernels capture how
-                    models measure the distance/\( \operatorname{sim} \)ilarity between inputs.
-                    Two representations are considered the same if their kernels are the same for corresponding inputs.
-                    We then say the representations are <strong>aligned</strong>.
-                    For example, if a text encoder
-                    \( f_{\text{text}} \) is aligned with an image encoder \( f_{\text{img}} \), we expect the
-                    \( \operatorname{sim} \)ilarity of apples and oranges in text to correspond closely to the \(
-                    \operatorname{sim} \)ilarity
-                    of their image representations:
-                </p>
-                <figure>
-                    <img src="figures/alignment_metric.jpg" , alt="Representation Similarity">
-                </figure>
+            <h3>Kernel Alignment Metric</h3>
+            <p>
+                We characterize representations in terms of their <strong>kernels</strong>, which capture the similarity
+                between data points. Two representations are considered <strong>aligned</strong> if their kernels are
+                similar for corresponding inputs. For example, if the text encoder \( g_{\text{text}} \) is aligned with
+                the image encoder \( f_{\text{img}} \), the similarity between text representations of "apple" and
+                "orange" should correspond closely to the similarity between their image representations.
+            </p>
 
-                <p>
-                    To quantify alignment, we use the mutual \(k\)-nearest neighbor (mutual-KNN) kernel alignment metric
-                    \(m\) as used by <a href="https://arxiv.org/abs/2405.07987 ">Huh et al. (2024)</a>. The kernels are
-                    defined as:
-                </p>
-                <ul>
-                    <li><strong>Unimodal Kernels:</strong>
+            <p>
+                To quantify this alignment, we use the <strong>mutual \(k\)-nearest neighbor (mutual-KNN) kernel
+                    alignment metric</strong> \( m \), as introduced by <a href="https://arxiv.org/abs/2405.07987">Huh
+                    et al. (2024)</a>. We define the kernels as:
+            </p>
+
+            <ul>
+                <li>
+                    <strong>Unimodal Kernels:</strong>
+                    <p>
                         \[
-                        K_X(i, j) = \langle X_\text{enc}(x^{(i)}), X_\text{enc}(x^{(j)}) \rangle, \quad
-                        K_Y(i, j) = \langle Y_\text{enc}(y^{(i)}), Y_\text{enc}(y^{(j)}) \rangle.
+                        K_X(i, j) = \langle X_\text{enc}(x^{(i)}), X_\text{enc}(x^{(j)}) \rangle, \quad K_Y(i, j) =
+                        \langle Y_\text{enc}(y^{(i)}), Y_\text{enc}(y^{(j)}) \rangle.
                         \]
-                    </li>
-                    <li><strong>Aligned Multimodal Kernel:</strong>
+                    </p>
+                </li>
+                <li>
+                    <strong>Aligned Multimodal Kernel:</strong>
+                    <p>
                         \[
-                        K_{\text {repr }}(i, j)=\left\langle r^{(i)}, r^{(j)}\right\rangle
+                        K_{\text{repr}}(i, j) = \langle r^{(i)}, r^{(j)} \rangle,
                         \]
-                        where \( r^{(i)} \) is the aligned multimodal representation as described in section
-                        "Interpretation and Connection to PRH".
-                        <!-- how to reference to a section in HTML? -->
-                    </li>
-                    <li><strong>Performant Model Kernel:</strong>
+                    </p>
+                    where \( r^{(i)} \) is the aligned multimodal representation.
+                </li>
+                <li>
+                    <strong>Performant Model Kernel:</strong>
+                    <p>
                         \[
                         K_\text{DinoV2}(i, j) = \langle \text{DinoV2}(x^{(i)}), \text{DinoV2}(x^{(j)}) \rangle.
                         \]
-                    </li>
-                </ul>
+                    </p>
+                </li>
+            </ul>
 
-                <h4>Before Training</h4>
-                <p>
-                    Compute alignment metrics for unimodal kernels relative to the reference performant model kernel \(
-                    K_{\text{DinoV2}} \):
-                </p>
-                <p>
-                    \[
-                    m(K_X, K_{\text{DinoV2}}), \quad m(K_Y, K_{\text{DinoV2}})
-                    \]
-                </p>
+            <h4>Before Training</h4>
+            <p>
+                We compute the alignment metrics for the unimodal kernels relative to the performant model kernel:
+            </p>
+            <p>
+                \[
+                m(K_X, K_{\text{DinoV2}}), \quad m(K_Y, K_{\text{DinoV2}}).
+                \]
+            </p>
 
-                <h4>After Training</h4>
-                <p>
-                    Evaluate the mutual-KNN alignment for the aligned multimodal kernel \( K_{\text{repr}} \) against \(
-                    K_{\text{DinoV2}} \):
-                </p>
-                <p>
-                    \[
-                    m(K_{\text{repr}}, K_{\text{DinoV2}})
-                    \]
-                </p>
+            <h4>After Training</h4>
+            <p>
+                We evaluate the mutual-KNN alignment for the aligned multimodal kernel against the performant model
+                kernel:
+            </p>
+            <p>
+                \[
+                m(K_{\text{repr}}, K_{\text{DinoV2}}).
+                \]
+            </p>
 
+            <h4>Key Hypothesis</h4>
+            <p>
+                We hypothesize that the aligned multimodal kernel achieves higher similarity with \( K_{\text{DinoV2}}
+                \) than the average of the unimodal kernels:
+            </p>
+            <p>
+                \[
+                m(K_{\text{repr}}, K_{\text{DinoV2}}) > \text{avg}\left(m(K_X, K_{\text{DinoV2}}), m(K_Y,
+                K_{\text{DinoV2}})\right).
+                \]
+            </p>
 
-                <h4>Key Hypothesis</h4>
-                <p>
-                    The aligned multimodal kernel achieve <strong>higher similarity</strong> with \( K_{\text{DinoV2}}
-                    \) than the unimodal kernels:
-                </p>
-                <p>
-                    \[
-                    m(K_{\text{repr}}, K_{\text{DinoV2}}) > \text{avg}\big(m(K_X, K_{\text{DinoV2}}), m(K_Y,
-                    K_{\text{DinoV2}})\big)
-                    \]
-                </p>
-                <p>
-                    <a href="https://arxiv.org/abs/2405.07987 ">Huh et al. (2024)</a> identify that representations are
-                    converging across modalities i.e. models are
-                    learning an increasingly modality agnostic representation of the world.
-                    Our hypothesis goes beyond that and suggests multimodal alignment via contrastive learning as an
-                    algorithm to drive representational convergence
-                    towards a more platonic repesentation.
-                </p>
-                <p>
-                    A stronger version of our hypothesis is if the aligned multimodal kernel surpasses even the better
-                    unimodal kernel:
-                </p>
-                <p>
-                    \[
-                    m(K_{\text{repr}}, K_{\text{DinoV2}}) > \max\big(m(K_X, K_{\text{DinoV2}}), m(K_Y,
-                    K_{\text{DinoV2}})\big)
-                    \]
-                </p>
-                <p>
-                    This would suggest an emergent-like
-                    "whole is greater than the sum of its parts" property where the multimodal kernel
-                    is more similar to the hypothesized platonic representation than either unimodal kernel alone.
-                </p>
+            <p>
+                A stronger version of this hypothesis posits that the aligned multimodal kernel surpasses even the best
+                unimodal kernel:
+            </p>
+            <p>
+                \[
+                m(K_{\text{repr}}, K_{\text{DinoV2}}) > \max\left(m(K_X, K_{\text{DinoV2}}), m(K_Y,
+                K_{\text{DinoV2}})\right).
+                \]
+            </p>
+
+            <p>
+                This would suggest an emergent property where the whole (multimodal representation) is greater than the
+                sum of its parts (unimodal representations), aligning more closely with the hypothesized Platonic
+                representation.
+            </p>
+
         </section>
 
         <section id="methodology">
@@ -502,8 +479,12 @@
                 <li>Updating adapter weights using gradient descent.</li>
             </ol>
             <figure>
-                <img src="figures/training_loss_metrics.png" alt="Training Metrics">
-                <figcaption>Training loss and kernel alignment metrics over epochs.</figcaption>
+                <img src="figures/img_txt_concept.svg" alt="Multimodal Alignment Architecture">
+                <figcaption>
+                    <strong>Figure 4.</strong> Model architecture showing the use of frozen encoders and learned
+                    adapters to align image and text
+                    representations into a shared multimodal latent space.
+                </figcaption>
             </figure>
 
             <h3>Evaluation Metrics</h3>
@@ -560,6 +541,10 @@
                     unimodal kernels to DinoV2, it fell short of the maximum similarity (i.e., the image modality
                     kernel).</li>
             </ul>
+            <figure>
+                <img src="figures/training_loss_metrics.png" alt="Training Metrics">
+                <figcaption>Training loss and kernel alignment metrics over epochs.</figcaption>
+            </figure>
 
             <h3>Metrics</h3>
             <p>
