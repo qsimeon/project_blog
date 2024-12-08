@@ -44,7 +44,8 @@
             </p>
             <figure>
                 <img src="figures/img_txt_concept.svg" alt="Multimodal Alignment Process">
-                <figcaption>Placeholder: Diagram illustrating multimodal alignment across 2 modalities (image and text).
+                <figcaption><strong>Figure 1.</strong> Diagram illustrating multimodal alignment across 2 modalities
+                    (image and text).
                 </figcaption>
             </figure>
 
@@ -134,14 +135,40 @@
             </p>
             <p>
                 \[
-                \mathcal{D}_\text{world} = \left\{\left(x^{(i)}, y^{(i)}, z^{(i)}\right) \right\}_{i=1}^N, \quad x \in
-                \mathcal{X}, y \in \mathcal{Y}, z \in \mathcal{Z},
+                \mathcal{D}_\text{world} = \left\{\left(\theta^{(i)}, \psi^{(i)}, \phi^{(i)}, \dots \right)
+                \right\}_{i=1}^N, \quad
+                \theta \in \mathcal{\Theta}, \psi \in \mathcal{\Psi}, \phi \in \mathcal{\Phi}, \dots
                 \]
             </p>
             <p>
-                where \( \mathcal{X}, \mathcal{Y}, \mathcal{Z} \) represent different modalities (e.g., image, text,
-                audio), and \( x, y, z \) are specific instances of these modalities.
+                where \( \{ \mathcal{\Theta}, \mathcal{\Psi}, \mathcal{\Phi}, \dots \} \) represent different modalities
+                (e.g., image,
+                text,
+                audio, ...), and \( \{ \theta, \psi, \phi, \dots \} \) are specific instances of the corresponding
+                modalities.
             </p>
+            <p>
+                For simplicity, we focus in this project on a two-modality world with image and text data:
+            </p>
+            <p>
+                \[
+                \mathcal{D}_\text{world} = \left\{\left(x^{(i)}, y^{(i)}\right) \right\}_{i=1}^N, \quad x \in
+                \mathcal{X}, y \in \mathcal{Y}
+                \]
+            </p>
+            <p>
+                where \(\mathcal{X}\) is the image modality and \(\mathcal{Y}\) is the text modality.
+            </p>
+            <img src="figures/platonic_representation.svg" , alt="Platonic Representation Hypothesis">
+            <figcaption>
+                <strong>Figure 2.</strong> Apapted from the blog post of <a href="https://phillipi.github.io/prh/">The
+                    Platonic Representation Hypothesis (PRH)</a> by <a href="https://arxiv.org/abs/2405.07987 ">Huh et
+                    al. (2024)</a>. The PRH conjectures that representations learned on each modality on its own will
+                converge to
+                a similar representation and the limit this convergence is the Platonic representation. We posit that we
+                can drive this convergence by aligning representations of different modalities into a shared latent
+                space via constrastve learning.
+            </figcaption>
 
             <h3>Learned Adapters</h3>
             <p>
@@ -150,9 +177,11 @@
             <p>
                 \[
                 X_\text{enc}: \mathcal{X} \rightarrow \mathbb{R}^{d_x}, \quad
-                Y_\text{enc}: \mathcal{Y} \rightarrow \mathbb{R}^{d_y}, \quad
-                Z_\text{enc}: \mathcal{Z} \rightarrow \mathbb{R}^{d_z}.
+                Y_\text{enc}: \mathcal{Y} \rightarrow \mathbb{R}^{d_y} \quad
                 \]
+            </p>
+            <p>
+                where \( d_x, d_y \) are the embedding dimensions of the image and text inputs, respectively.
             </p>
             <p>
                 To align representations into a shared latent space \( \mathbb{R}^{d_e} \), we introduce learned linear
@@ -161,9 +190,24 @@
             <p>
                 \[
                 W_x : \mathbb{R}^{d_x} \rightarrow \mathbb{R}^{d_e}, \quad
-                W_y : \mathbb{R}^{d_y} \rightarrow \mathbb{R}^{d_e}, \quad
-                W_z : \mathbb{R}^{d_z} \rightarrow \mathbb{R}^{d_e}.
+                W_y : \mathbb{R}^{d_y} \rightarrow \mathbb{R}^{d_e} \quad
                 \]
+            </p>
+            <p>
+                where \( d_e \) is the dimensionality of the shared latent space.
+                The compositions of the encoders and corresponding adapters are analagous to the functions \(
+                f_\text{img}, g_\text{text} \)
+                in the PRH (Figure 1), i.e:
+            </p>
+            <p>
+                \[
+                f_\text{img} = W_x \circ X_\text{enc}, \quad
+                g_\text{text} = W_y \circ Y_\text{enc} \quad
+                \]
+            </p>
+            <p>
+                While we only discuss linear adapters in the mathematical framework, our implementation also explores
+                the use of simple 2-layer multi-layer perceptron (MLP) adapters.
             </p>
 
             <h3>Contrastive Learning Objective</h3>
@@ -184,16 +228,10 @@
             </p>
             Intuitively, the contrastive loss function encourages the model to align matching pairs $(x(i), y(i))$ while
             pushing apart non-matching pairs.
-            <!-- TODO: Add a conceptual figure here showing images and captions from Flickr30k being aligned into representation space (see figure from pset4). -->
-            <img src="figures/conceptual_contrastive.jpg" , alt="Aligning Image Text Dataset Flickr30k">
+            <img src="figures/conceptual_contrastive.svg" , alt="Aligning Image Text Dataset Flickr30k">
             <figcaption>
-                Conceptual illustration of contrastive learning: aligning image and text representations from the
-                Flickr30k
-                dataset. Visualize as if we have a distribution over images, a distribution over text, and we are trying
-                to
-                align them into a shared latent space where the representations are close for matching (img, caption)
-                pairs
-                and far for non-matching pairs.
+                <strong>Figure 3.</strong> Conceptual illustration of contrastive learning: aligning image and text
+                representations from the Flickr30k dataset.
             </figcaption>
 
             <h3>Kernel Alignment Metric</h4>
@@ -303,26 +341,6 @@
 
         <section id="methodology">
             <h2>Methodology</h2>
-
-            <h3>Overview</h3>
-            <p>
-                Our implementation builds on the mathematical framework but incorporates necessary simplifications and
-                extensions to address practical considerations. Below, we outline our data pipeline, model architecture,
-                training procedure, evaluation metrics, and key discrepancies between the idealized framework and the
-                implemented system.
-            </p>
-
-            <h3>Key Discrepancies</h3>
-            <ul>
-                <li><strong>Number of Modalities:</strong> While the mathematical framework describes a general
-                    multimodal setting (\( \mathcal{X}, \mathcal{Y}, \mathcal{Z}, \dots \)), our implementation is
-                    restricted
-                    to two modalities: images (\( \mathcal{X} \)) and text (\( \mathcal{Y} \)). This choice simplifies
-                    the problem but still demonstrates the core concept of cross-modal alignment.</li>
-                <li><strong>Adapter Variants:</strong> For simplicity in the mathemetical framework, we only dicussed
-                    linear adapters for all modalities (\( W_x,
-                    W_y, W_z \)). Our implementation also explores using simple 2-layer MLPs as adapters.</li>
-            </ul>
 
             <h3>Data Pipeline</h3>
             <p>
