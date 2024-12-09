@@ -408,218 +408,180 @@
         </section>
 
         <section id="methodology">
-            <h2>Methodology</h2>
-
-            <h3>Data Pipeline</h3>
-            <p>
-                The data pipeline processes paired image and text data from the Flickr30k dataset, which contains paired
-                image-caption samples, making it ideal for our two-modality prototype. Key stages include:
-            </p>
-            <ul>
-                <li><strong>Image Processing:</strong> Images are resized to \( 224 \times 224 \) pixels, normalized to
-                    match ResNet-18 preprocessing, and converted to tensors.</li>
-                <li><strong>Text Processing:</strong> Captions are tokenized using the BERT tokenizer, padded to uniform
-                    length, and converted to tensors.</li>
-                <li><strong>Data Loading:</strong> Configurations include a batch size of 64, shuffling, and
-                    optimizations for GPU utilization.</li>
-            </ul>
-            <figure>
-                <img src="figures/data_pipeline.png" alt="Data Pipeline">
-                <figcaption>Data pipeline: preprocessing images and captions for input to the model.</figcaption>
-            </figure>
-
-            <h3>Model Architecture</h3>
-            <p>
-                While the mathemical formulation il;;ustrated the use pf linear adapters, our implementation also
-                explores
-                the use of simple 2-layer multi-layer perceptron (MLP) adapters:
-            </p>
-            <p>
-                \[
-                f_\text{img} := \operatorname{MLP}_x \circ X_\text{enc}, \quad
-                g_\text{text} := \operatorname{MLP}_y \circ Y_\text{enc} \quad
-                \]
-            </p>
-            <p>
-                The architecture combines frozen pre-trained encoders with trainable adapters to project representations
-                into a shared multimodal space:
-            </p>
-            <ul>
-                <li><strong>Encoders:</strong> ResNet-18 for images (\( d_\text{enc} = \mathbb{R}^{512} \)) and
-                    DistilBERT for text (\(
-                    d_\text{enc} = \mathbb{R}^{768} \)).</li>
-                <li><strong>Adapters:</strong>
-                    <ul>
-                        <li>Linear adapters (\( \mathbb{R}^{d_\text{enc}} \to \mathbb{R}^{384} \)).</li>
-                        <li>MLP adapters (\( \mathbb{R}^{d_\text{enc}} \to \mathbb{R}^{2048} \to \mathbb{R}^{1024} \to
-                            \mathbb{R}^{384} \)).</li>
-                    </ul>
-                </li>
-            </ul>
-            <figure>
-                <img src="figures/model_architecture.png" alt="Model Architecture">
-                <figcaption>Model architecture: frozen encoders, adapters, and shared multimodal latent space.
-                </figcaption>
-            </figure>
-
-            <h3>Training Procedure</h3>
-            <p>
-                We use contrastive learning to align representations. The training loop involves:
-            </p>
-            <ol>
-                <li>Processing paired batches through the encoders and adapters.</li>
-                <li>Computing contrastive loss to align matching pairs and separate mismatched pairs:
-                    <br>
-                    \[
-                    \mathcal{L} = -\frac{1}{N} \sum_{i=1}^N \log \frac{\exp\left(\langle W_x X_\text{enc}(x^{(i)}), W_y
-                    Y_\text{enc}(y^{(i)}) \rangle / \tau \right)}{\sum_{j=1}^N \exp\left(\langle W_x
-                    X_\text{enc}(x^{(i)}), W_y Y_\text{enc}(y^{(j)}) \rangle / \tau \right)}.
-                    \]
-                </li>
-                <li>Updating adapter weights using gradient descent.</li>
-            </ol>
-            <figure>
-                <img src="figures/img_txt_concept.svg" alt="Multimodal Alignment Architecture">
-                <figcaption>
-                    <strong>Figure 4.</strong> Model architecture showing the use of frozen encoders and learned
-                    adapters to align image and text
-                    representations into a shared multimodal latent space.
-                </figcaption>
-            </figure>
-
-            <h3>Evaluation Metrics</h3>
-            <p>
-                We evaluate the learned representations using the mutual-KNN kernel alignment metric (\( m \)),
-                comparing kernels before and after training:
-            </p>
-            <ul>
-                <li><strong>Unimodal Kernel Similarity:</strong> Baseline similarity of ResNet-18 and DistilBERT
-                    representations to DINOv2 embeddings.</li>
-                <li><strong>Aligned Kernel Similarity:</strong> Final similarity of the aligned/multimodal
-                    representations to
-                    DINOv2 embeddings.</li>
-            </ul>
-            <figure>
-                <img src="figures/kernel_heatmaps.png" alt="Kernel Similarity Heatmaps">
-                <figcaption>Heatmaps showing kernel similarities for unimodal and multimodal embeddings with DINOv2.
-                </figcaption>
-            </figure>
-
-            <h3>Implementation Details</h3>
             <p>
                 All code we used for this project is implemented in this <a
                     href="https://colab.research.google.com/drive/1BkyPko0x-8CL41Z-VSmyxI41B90hB2Fc?usp=sharing">Google
                     Colab notebook</a>.
             </p>
+            <h2>Methodology</h2>
+
+            <h3>Data Pipeline</h3>
+            <p>
+                We use the <strong>Flickr30k</strong> dataset, which contains paired image-caption samples. The data
+                pipeline processes these pairs to generate tensors compatible with our models. Key stages of the
+                pipeline include:
+            </p>
             <ul>
-                <li><strong>Frameworks:</strong> PyTorch for modeling, Hugging Face Transformers for text encoding, and
-                    Weights & Biases for experiment tracking.</li>
-                <li><strong>Hyperparameters:</strong>
+                <li><strong>Image Processing:</strong>
                     <ul>
-                        <li>Batch size: 64</li>
-                        <li>Learning rate: \( 1 \times 10^{-4} \)</li>
-                        <li>Temperature (\( \tau \)): 0.07</li>
-                        <li>Epochs: 50</li>
+                        <li>Resize images to \(224 \times 224\) pixels.</li>
+                        <li>Normalize using ImageNet statistics.</li>
+                        <li>Convert to tensors suitable for ResNet-18.</li>
+                    </ul>
+                </li>
+                <li><strong>Text Processing:</strong>
+                    <ul>
+                        <li>Tokenize captions using the DistilBERT tokenizer.</li>
+                        <li>Pad or truncate tokens to a maximum length of 64.</li>
+                        <li>Convert tokens to tensors suitable for DistilBERT.</li>
+                    </ul>
+                </li>
+                <li><strong>Data Loading:</strong>
+                    <ul>
+                        <li>Batch size: 256</li>
+                        <li>75%-25% train-validation split.</li>
+                        <li>Optimized for GPU utilization with shuffling and pinning memory.</li>
                     </ul>
                 </li>
             </ul>
-        </section>
-
-
-        <section id="initial-results">
-            <h2>Initial Results</h2>
-            <p>
-                Our experiments with image and text modalities have yielded promising results. By aligning
-                representations from ResNet-18 and DistilBERT, we observed:
-            </p>
-            <ul>
-                <li><strong>Alignment Success:</strong> Aligned representations demonstrated improved similarity to
-                    DinoV2 embeddings.</li>
-                <li><strong>Cross-Modality Insights:</strong> Text embeddings, which DinoV2 was not trained to process,
-                    gained representational properties closer to its image embeddings.</li>
-                <li><strong>Caveat:</strong> While the aligned representation exceeded the average similarity of
-                    unimodal kernels to DinoV2, it fell short of the maximum similarity (i.e., the image modality
-                    kernel).</li>
-            </ul>
             <figure>
-                <img src="figures/training_loss_metrics.png" alt="Training Metrics">
-                <figcaption>Training loss and kernel alignment metrics over epochs.</figcaption>
+                <img src="figures/data_pipeline.png" alt="Data Pipeline">
+                <figcaption><strong>Figure 1.</strong> The data pipeline preprocesses images and text for input into the
+                    model.</figcaption>
             </figure>
 
-            <h3>Metrics</h3>
+            <h3>Model Architecture</h3>
             <p>
-                Key kernel alignment metrics include:
+                The architecture consists of frozen pre-trained encoders and trainable adapters that align
+                representations in a shared multimodal space.
             </p>
             <ul>
-                <li>Text-to-DinoV2 similarity: Low, due to modality mismatch.</li>
-                <li>Image-to-DinoV2 similarity: High, reflecting shared training data.</li>
-                <li>Aligned multimodal similarity: Intermediate, surpassing the average of unimodal similarities.</li>
+                <li><strong>Image Encoder:</strong> ResNet-18 (frozen, output dimension: 512).</li>
+                <li><strong>Text Encoder:</strong> DistilBERT (frozen, output dimension: 768).</li>
+                <li><strong>Adapters:</strong>
+                    <ul>
+                        <li><strong>Linear Adapter:</strong> Projects encoder outputs to a shared dimension (384):
+                            \[
+                            W_x : \mathbb{R}^{512} \to \mathbb{R}^{384}, \quad W_y : \mathbb{R}^{768} \to
+                            \mathbb{R}^{384}.
+                            \]
+                        </li>
+                        <li><strong>MLP Adapter:</strong> A two-layer MLP with GELU activation and LayerNorm:
+                            \[
+                            \operatorname{MLP}(x) = \operatorname{LayerNorm}(\operatorname{GELU}(W_2
+                            \operatorname{GELU}(W_1 x))).
+                            \]
+                        </li>
+                    </ul>
+                </li>
             </ul>
-            <div class="figures-container">
-                <figure>
-                    <img src="figures/mlp/2d/m2d.gif" alt="2D MLP Adapter">
-                    <figcaption>MLP Adapter</figcaption>
-                </figure>
-                <figure>
-                    <img src="figures/mlp/3d/m3d.gif" alt="3D MLP Adapter">
-                    <figcaption>MLP Adapter</figcaption>
-                </figure>
-            </div>
-            <div class="figures-container">
-                <figure>
-                    <img src="figures/linear/2d/l2d.gif" alt="2D Linear Adapter">
-                    <figcaption>Linear Adapter</figcaption>
-                </figure>
-                <figure>
-                    <img src="figures/linear/3d/l3d.gif" alt="3D Linear Adapter">
-                    <figcaption>Linear Adapter</figcaption>
-                </figure>
-            </div>
-            <p>
-                The bar plot in Figure 5 visually summarizes the kernel alignment metrics before and after training the
-                adapters.
-                We can immediately inspect whether our hypotheses stated in the Mathematical Framework section are
-                supported or not.
-            </p>
             <figure>
-                <img src="figures/bar_plot_sketch.jpg" alt="Kernel Alignment Metric Before and After Trainign">
-                <figcaption><strong>Figure 5.</strong>Placeholder: Bar plot showing kernel alignment for text, image,
-                    and multimodal embeddings
-                    before and after training adapters to align unimodal representations into a latent multimodal
-                    representation using contrastive loss. The top subplot is for the linear adapter. The bottom suplot
-                    is for the MLP adapter.
-                    Each suplplot shows bars for before and after training of the adapters for the image (hacthed bars)
-                    and text (solid bars) modalities.
-                    The y-axis is the mutual-kNN kernel alignment metric \(m\) between the modality embedding and the
-                    DinoV2 embedding
-                    (which we assume approximates the Platonic representation).</figcaption>
+                <img src="figures/model_architecture.png" alt="Model Architecture">
+                <figcaption><strong>Figure 2.</strong> Frozen encoders and trainable adapters align image and text
+                    representations.</figcaption>
+            </figure>
+
+            <h3>Training Procedure</h3>
+            <p>
+                We train the adapters using a <strong>bidirectional contrastive loss</strong> with temperature scaling
+                (\(\tau = 0.07\)):
+            </p>
+            <p>
+                \[
+                \mathcal{L} = -\frac{1}{N} \sum_{i=1}^N \log \frac{\exp\left(f_\text{img}(x^{(i)}) \cdot
+                g_\text{text}(y^{(i)}) / \tau\right)}{\sum_{j=1}^N \exp\left(f_\text{img}(x^{(i)}) \cdot
+                g_\text{text}(y^{(j)}) / \tau\right)}.
+                \]
+            </p>
+            <p>The training loop consists of:</p>
+            <ol>
+                <li>Forward pass through frozen encoders and adapters.</li>
+                <li>Compute contrastive loss for matching and non-matching pairs.</li>
+                <li>Update adapter weights using the AdamW optimizer with:
+                    <ul>
+                        <li>Learning rate: \(5 \times 10^{-5}\) (cosine decay with warmup).</li>
+                        <li>Gradient clipping (norm: 1.0).</li>
+                        <li>Weight decay: 0.01.</li>
+                    </ul>
+                </li>
+            </ol>
+            <figure>
+                <img src="figures/img_txt_concept.svg" alt="Multimodal Alignment Architecture">
+                <figcaption><strong>Figure 3.</strong> Contrastive alignment of image and text representations in a
+                    shared latent space.</figcaption>
+            </figure>
+
+            <h3>Evaluation Metrics</h3>
+            <p>
+                We evaluate alignment using the <strong>mutual-KNN kernel alignment metric</strong> \(m\):
+            </p>
+            <ul>
+                <li><strong>Unimodal Kernels:</strong> Measure similarity between ResNet-18 and DistilBERT
+                    representations and DinoV2.</li>
+                <li><strong>Aligned Kernel:</strong> Measure similarity of aligned representations to DinoV2.</li>
+                <li><strong>Downstream Task:</strong> Classification on CIFAR-10 using aligned embeddings as feature
+                    inputs.</li>
+            </ul>
+            <figure>
+                <img src="figures/kernel_heatmaps.png" alt="Kernel Alignment Heatmaps">
+                <figcaption><strong>Figure 4.</strong> Kernel similarity heatmaps before and after training.
+                </figcaption>
             </figure>
         </section>
 
-        <section id="proposed-extensions">
-            <h2>Proposed Extensions</h2>
-            <h3>1. Downstream Task Evaluation</h3>
+        <section id="results">
+            <h2>Results</h2>
+
+            <h3>Experiment 1: Alignment Training</h3>
             <p>
-                Evaluate aligned embeddings on downstream tasks, such as classification, using pre-trained heads.
-                Hypotheses include:
+                In this experiment, we train the adapters to align image and text representations using the contrastive
+                loss. The key findings are:
             </p>
             <ul>
-                <li>Slight performance degradation compared to DinoV2.</li>
-                <li>Aligned multimodal embeddings outperform unimodal embeddings.</li>
+                <li><strong>Kernel Alignment Improvement:</strong> The mutual-KNN alignment metric improves
+                    significantly after training, supporting our hypothesis.</li>
             </ul>
 
-            <h3>2. Adding a Third Modality</h3>
+            <figure>
+                <img src="figures/kernel_metric_barplot.png" alt="Kernel Metric Bar Plot">
+                <figcaption><strong>Figure 5.</strong> Bar plot showing the kernel alignment metric before and after
+                    training.</figcaption>
+            </figure>
+
             <p>
-                Expand the framework to include audio representations from models like Wav2Vec2. Test whether
-                integrating a third modality enhances alignment and demonstrates additive representation benefits.
+                <strong>Visualization of Aligned Representations:</strong> PCA plots show the improved alignment of
+                image and text embeddings after training.
             </p>
 
             <figure>
-                <img src="figures/multimodal-alignment.svg" alt="Multimodal Alignment Process">
-                <figcaption>Placeholder: Diagram illustrating multimodal alignment across three modalities (image, text,
-                    and audio).</figcaption>
+                <img src="figures/pca_alignment.png" alt="PCA of Aligned Representations">
+                <figcaption><strong>Figure 6.</strong> PCA of image and text representations before and after alignment.
+                </figcaption>
             </figure>
+
+            <h3>Experiment 2: Downstream Classification Task</h3>
+            <p>
+                We evaluate the quality of the aligned embeddings by using them as feature inputs for a CIFAR-10
+                classification task. The results show:
+            </p>
+            <ul>
+                <li><strong>Baseline (DinoV2):</strong> 97.96% accuracy.</li>
+                <li><strong>Aligned Embeddings:</strong> 76.49% accuracy.</li>
+                <li><strong>Image-Only Embeddings:</strong> 78.21% accuracy.</li>
+            </ul>
+
+            <figure>
+                <img src="figures/downstream_results.png" alt="Downstream Classification Results">
+                <figcaption><strong>Figure 7.</strong> CIFAR-10 classification performance using different embeddings.
+                </figcaption>
+            </figure>
+
+            <p>
+                These results indicate that while the aligned embeddings perform worse than DinoV2, they capture
+                meaningful multimodal features, supporting the effectiveness of our alignment approach.
+            </p>
         </section>
+
 
         <section id="future-directions">
             <h2>Future Directions</h2>
@@ -733,6 +695,103 @@
         <p>Multimodal Alignment Analysis | Blog | November 2024</p>
     </footer>
 </body>
+
+
+
+<!-- <section id="initial-results">
+    <h2>Initial Results</h2>
+    <p>
+        Our experiments with image and text modalities have yielded promising results. By aligning
+        representations from ResNet-18 and DistilBERT, we observed:
+    </p>
+    <ul>
+        <li><strong>Alignment Success:</strong> Aligned representations demonstrated improved similarity to
+            DinoV2 embeddings.</li>
+        <li><strong>Cross-Modality Insights:</strong> Text embeddings, which DinoV2 was not trained to process,
+            gained representational properties closer to its image embeddings.</li>
+        <li><strong>Caveat:</strong> While the aligned representation exceeded the average similarity of
+            unimodal kernels to DinoV2, it fell short of the maximum similarity (i.e., the image modality
+            kernel).</li>
+    </ul>
+    <figure>
+        <img src="figures/training_loss_metrics.png" alt="Training Metrics">
+        <figcaption>Training loss and kernel alignment metrics over epochs.</figcaption>
+    </figure>
+
+    <h3>Metrics</h3>
+    <p>
+        Key kernel alignment metrics include:
+    </p>
+    <ul>
+        <li>Text-to-DinoV2 similarity: Low, due to modality mismatch.</li>
+        <li>Image-to-DinoV2 similarity: High, reflecting shared training data.</li>
+        <li>Aligned multimodal similarity: Intermediate, surpassing the average of unimodal similarities.</li>
+    </ul>
+    <div class="figures-container">
+        <figure>
+            <img src="figures/mlp/2d/m2d.gif" alt="2D MLP Adapter">
+            <figcaption>MLP Adapter</figcaption>
+        </figure>
+        <figure>
+            <img src="figures/mlp/3d/m3d.gif" alt="3D MLP Adapter">
+            <figcaption>MLP Adapter</figcaption>
+        </figure>
+    </div>
+    <div class="figures-container">
+        <figure>
+            <img src="figures/linear/2d/l2d.gif" alt="2D Linear Adapter">
+            <figcaption>Linear Adapter</figcaption>
+        </figure>
+        <figure>
+            <img src="figures/linear/3d/l3d.gif" alt="3D Linear Adapter">
+            <figcaption>Linear Adapter</figcaption>
+        </figure>
+    </div>
+    <p>
+        The bar plot in Figure 5 visually summarizes the kernel alignment metrics before and after training the
+        adapters.
+        We can immediately inspect whether our hypotheses stated in the Mathematical Framework section are
+        supported or not.
+    </p>
+    <figure>
+        <img src="figures/bar_plot_sketch.jpg" alt="Kernel Alignment Metric Before and After Trainign">
+        <figcaption><strong>Figure 5.</strong>Placeholder: Bar plot showing kernel alignment for text, image,
+            and multimodal embeddings
+            before and after training adapters to align unimodal representations into a latent multimodal
+            representation using contrastive loss. The top subplot is for the linear adapter. The bottom suplot
+            is for the MLP adapter.
+            Each suplplot shows bars for before and after training of the adapters for the image (hacthed bars)
+            and text (solid bars) modalities.
+            The y-axis is the mutual-kNN kernel alignment metric \(m\) between the modality embedding and the
+            DinoV2 embedding
+            (which we assume approximates the Platonic representation).</figcaption>
+    </figure>
+</section>
+
+<section id="proposed-extensions">
+    <h2>Proposed Extensions</h2>
+    <h3>1. Downstream Task Evaluation</h3>
+    <p>
+        Evaluate aligned embeddings on downstream tasks, such as classification, using pre-trained heads.
+        Hypotheses include:
+    </p>
+    <ul>
+        <li>Slight performance degradation compared to DinoV2.</li>
+        <li>Aligned multimodal embeddings outperform unimodal embeddings.</li>
+    </ul>
+
+    <h3>2. Adding a Third Modality</h3>
+    <p>
+        Expand the framework to include audio representations from models like Wav2Vec2. Test whether
+        integrating a third modality enhances alignment and demonstrates additive representation benefits.
+    </p>
+
+    <figure>
+        <img src="figures/multimodal-alignment.svg" alt="Multimodal Alignment Process">
+        <figcaption>Placeholder: Diagram illustrating multimodal alignment across three modalities (image, text,
+            and audio).</figcaption>
+    </figure>
+</section> -->
 
 <style>
     figure {
