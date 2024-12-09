@@ -43,13 +43,15 @@
                 retraining these large models, enabling scalability to new modalities with minimal overhead.
             </p>
             <figure>
-                <img src="figures/img_txt_concept.svg" alt="Multimodal Alignment Architecture">
+                <img src="figures/conceptual_contrastive.svg" alt="Conceptual Multimodal Alignment">
                 <figcaption>
                     <strong>Figure 1.</strong> Conceptual illustration of our multimodal alignment framework. Image and
                     text representations
-                    from pre-trained encoders are aligned into a shared latent space using learned adapters. The
-                    dimension
-                    of the latent space set to that of the performant model (DinoV2) for comparison.
+                    from pre-trained encoders are aligned into a shared latent space using learned adapters. Matching
+                    image-text pairs from the Flickr30k dataset are contrastively
+                    aligned in
+                    the latent space, while non-matching pairs are pushed apart. The aim is to approximate the Platonic
+                    representations, which we use the embeddings of a performatn model (DinoV2) as a proxy for.
                 </figcaption>
             </figure>
 
@@ -212,17 +214,8 @@
                 To align the representations, we use a <strong>dual-encoder contrastive loss</strong>, inspired by the
                 formulation in <a href="https://phillipi.github.io/prh/">PRH</a> and Homework 4.
             </p>
-            <!-- <figure>
-                <img src="figures/homework4_contrastive.jpg" alt="Dual-Encoder Contrastive Loss">
-            </figure> -->
             <figure>
-                <img src="figures/conceptual_contrastive.svg" alt="Conceptual Multimodal Alignment">
-                <figcaption>
-                    <strong>Figure 3.</strong> Matching image-text pairs from the Flickr30k dataset are contrastively
-                    aligned in
-                    the latent space, while non-matching pairs are pushed apart. The aim is to approximate the Platonic
-                    representations, which we use the embeddings of a performatn model (DinoV2) as a proxy for.
-                </figcaption>
+                <img src="figures/homework4_contrastive.jpg" alt="Dual-Encoder Contrastive Loss">
             </figure>
 
             <p>
@@ -408,12 +401,13 @@
         </section>
 
         <section id="methodology">
+            <h2>Methodology</h2>
+
             <p>
                 All code we used for this project is implemented in this <a
                     href="https://colab.research.google.com/drive/1BkyPko0x-8CL41Z-VSmyxI41B90hB2Fc?usp=sharing">Google
                     Colab notebook</a>.
             </p>
-            <h2>Methodology</h2>
 
             <h3>Data Pipeline</h3>
             <p>
@@ -476,9 +470,15 @@
                 </li>
             </ul>
             <figure>
-                <img src="figures/model_architecture.png" alt="Model Architecture">
-                <figcaption><strong>Figure 2.</strong> Frozen encoders and trainable adapters align image and text
-                    representations.</figcaption>
+                <img src="figures/img_txt_concept.svg" alt="Multimodal Alignment Architecture">
+                <figcaption><strong>Figure 4.</strong> Conceptual illustration of our approach to using frozen
+                    pretrained
+                    encoders to map single modalities (image and text) into shared latent space.
+                    We encode image and text pairs of images and their cooresponding first caption a subset of the
+                    Flickr30k dataset using pretrained ResNet-18 and DistilBERT encoders. We use learnable adapters
+                    to map from the dimensions of the embeddings of these frozen encoders to a the dimension of the
+                    shared multimodal latent space which is set to be equal tot the dimension of the DinoV2 embeddings.
+                </figcaption>
             </figure>
 
             <h3>Training Procedure</h3>
@@ -505,11 +505,7 @@
                     </ul>
                 </li>
             </ol>
-            <figure>
-                <img src="figures/img_txt_concept.svg" alt="Multimodal Alignment Architecture">
-                <figcaption><strong>Figure 3.</strong> Contrastive alignment of image and text representations in a
-                    shared latent space.</figcaption>
-            </figure>
+
 
             <h3>Evaluation Metrics</h3>
             <p>
@@ -523,8 +519,10 @@
                     inputs.</li>
             </ul>
             <figure>
-                <img src="figures/kernel_heatmaps.png" alt="Kernel Alignment Heatmaps">
-                <figcaption><strong>Figure 4.</strong> Kernel similarity heatmaps before and after training.
+                <img src="figures/downstream_task.jpg" alt="Downstream Evaluation Diagram">
+                <figcaption><strong>Figure 4.</strong> We perform an experiment where we use the aligned embeddings as
+                    feature inputs for a CIFAR-10 classification task. We compare the performance of the aligned
+                    embeddings to the image-only embeddings and the DinoV2 embeddings.
                 </figcaption>
             </figure>
         </section>
@@ -535,18 +533,23 @@
             <h3>Experiment 1: Alignment Training</h3>
             <p>
                 In this experiment, we train the adapters to align image and text representations using the contrastive
-                loss. The key findings are:
+                loss. We train linear and MLP adapters for 20 epochs.
+            </p>
+            <p>
+                For our aligned representation, we use the average
+                embedding of \( f_{\text{img}}(x)$ and $g_{\text{text}}(y) \).
+                The key findings are:
             </p>
             <ul>
-                <li><strong>Kernel Alignment Improvement:</strong> The mutual-KNN alignment metric improves
-                    significantly after training, supporting our hypothesis.</li>
+                <li><strong>Kernel Alignment Improvement:</strong> The mutual-KNN alignment metric improves after
+                    training, supporting our hypothesis.</li>
             </ul>
 
             <figure>
                 <img src="figures/kernel_metric_barplot.svg" alt="Kernel Metric Bar Plot">
                 <figcaption><strong>Figure 5.</strong> Bar plot showing the kernel alignment metric before and after
                     training.</figcaption>
-                <!-- TODO: Better caption this based on wha's shwn in the figure. -->
+                <!-- TODO: Better caption this based on what's shown in the figure. -->
             </figure>
 
             <p>
@@ -555,8 +558,11 @@
             </p>
 
             <figure>
-                <img src="figures/pca_alignment.png" alt="PCA of Aligned Representations">
-                <figcaption><strong>Figure 6.</strong> PCA of image and text representations before and after alignment.
+                <img src="figures/pca_alignment.svg" alt="PCA of Aligned Representations">
+                <figcaption><strong>Figure 6.</strong> Before and after training the two types of adpters, we get the
+                    \(384\)-dimension aligned representation vector for every data in our FLickr30k test set image and
+                    perform PCA on these vectors.
+                    The PCA plot shows the aligned representations of the image and text embeddings after training.
                 </figcaption>
             </figure>
 
@@ -572,8 +578,10 @@
             </ul>
 
             <figure>
-                <img src="figures/downstream_results.png" alt="Downstream Classification Results">
+                <img src="figures/downstream_eval_table.png" alt="Downstream Evaluation Table">
                 <figcaption><strong>Figure 7.</strong> CIFAR-10 classification performance using different embeddings.
+                    We evaluate whether our aligned multimodal representation is transferable to the downstream task of
+                    CIFAR10 classification.
                 </figcaption>
             </figure>
 
@@ -590,6 +598,15 @@
                 <li>Scale experiments to richer multimodal datasets and benchmarks.</li>
                 <li>Investigate cross-architecture generalization of aligned embeddings.</li>
                 <li>Analyze mechanistic insights into alignment-driven representation convergence.</li>
+                <li>Replacing DinoV2's feature extractor with our aligned representation in-front of <strong>pre-trained
+                        heads</strong>
+                    (e.g., for ImageNet classification).</li>
+                <!-- TODO: Link to table of pretrained classifere heads: https://github.com/facebookresearch/dinov2?tab=readme-ov-file -->
+                <img src="figures/dino_pretrained_imclass_heads.jpg" alt="DinoV2 Pretrained Image Classification Heads">
+                <li>Using all five captions in the Flickr30k dataset as positive anchors for each image instead of just
+                    using the first caption as we did here.</li>
+                <img src="figures/extension_all_captions.jpg" alt="An Image is Worth 5 Captions">
+                <!-- TODO: Link to comments in prototype notebook. -->
             </ul>
         </section>
 
