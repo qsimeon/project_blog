@@ -439,7 +439,7 @@
                 </li>
             </ul>
             <figure>
-                <img src="figures/data_pipeline.png" alt="Data Pipeline">
+                <img src="figures/data_pipeline.jpg" alt="Data Pipeline">
                 <figcaption><strong>Figure 1.</strong> The data pipeline preprocesses images and text for input into the
                     model.</figcaption>
             </figure>
@@ -566,7 +566,16 @@
                 </figcaption>
             </figure>
 
-            <h3>Experiment 2: Downstream Classification Task</h3>
+            <h3>Experiment 2: Testing Key Hypothesis</h3>
+            <p>
+                Recall from the mathematical framework section, we first wanted to know
+                (1) what to use for the aligned representation:
+                - should we use the average of the everage embeddings of the trained encoders
+                - or should we just use the embedding of the trained encoder that is more cimialr to the DinoV2
+                embeddings.
+            </p>
+
+            <h3>Experiment 3: Downstream Classification Task</h3>
             <p>
                 We evaluate the quality of the aligned embeddings by using them as feature inputs for a CIFAR-10
                 classification task. The results show:
@@ -578,7 +587,7 @@
             </ul>
 
             <figure>
-                <img src="figures/downstream_eval_table.png" alt="Downstream Evaluation Table">
+                <img src="figures/downstream_eval_table.jpg" alt="Downstream Evaluation Table">
                 <figcaption><strong>Figure 7.</strong> CIFAR-10 classification performance using different embeddings.
                     We evaluate whether our aligned multimodal representation is transferable to the downstream task of
                     CIFAR10 classification.
