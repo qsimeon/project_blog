@@ -145,117 +145,7 @@
             </ul>
         </section> -->
 
-        <section id="introduction">
-            <h2>Introduction</h2>
-            <p>
-                Deep learning models transform raw data into task-specific representations. Recently, two key research
-                areas have deepened our understanding of these representations. The <strong>CLIP framework</strong>
-                demonstrated the power of aligning image and text representations via paired data. The <strong>Platonic
-                    Representation Hypothesis</strong> posits that well-performing models converge toward a shared
-                statistical model of reality in their latent spaces.
-            </p>
-            <p>
-                This project bridges these ideas by exploring whether representations from pre-trained unimodal neural
-                networks (e.g., ResNet-18 for images and DistilBERT for text) can be aligned into a shared multimodal
-                latent space. Inspired by CLIP's joint embedding approach and the Platonic Representation Hypothesis, we
-                use frozen encoders with lightweight adapters to achieve alignment without retraining larger models like
-                DINOv2. This enables efficient scalability to new modalities.
-            </p>
-            <figure>
-                <img src="figures/conceptual_contrastive.svg" alt="Conceptual Multimodal Alignment"
-                    style="width: 100%; max-width: 1200px; margin: 0 auto;">
-                <figcaption>
-                    <strong>Figure 1.</strong> Conceptual illustration of our multimodal alignment framework.
-                    Representations from ResNet-18 (images) and DistilBERT (text) are aligned using lightweight
-                    adapters. Matching image-caption pairs are pulled together, while non-matching pairs are pushed
-                    apart.
-                </figcaption>
-            </figure>
-        </section>
-
-        <section id="motivation">
-            <h3>Motivation</h3>
-            <p>
-                Our approach is motivated by three key insights:
-            </p>
-            <ol>
-                <li>
-                    <strong>Inspiration from CLIP:</strong> CLIP demonstrated that cross-modal representations can be
-                    aligned using paired data and contrastive learning. However, joint training limits scalability to
-                    new modalities. Our method decouples the encoders, aligning their outputs via lightweight adapters.
-                </li>
-                <li>
-                    <strong>Testing the Platonic Representation Hypothesis:</strong> This hypothesis suggests that
-                    models converge toward a shared statistical model of reality. Aligning diverse unimodal encoders
-                    tests whether this convergence can be explicitly achieved.
-                </li>
-                <li>
-                    <strong>Scalability and Modularity:</strong> By aligning frozen encoders post hoc, our framework
-                    supports efficient integration of new modalities without the need for extensive joint training.
-                </li>
-            </ol>
-        </section>
-
-        <section id="related-work">
-            <h2>Related Work</h2>
-            <p>
-                Our project builds on key advances in multimodal learning and theoretical insights:
-            </p>
-            <ol>
-                <li>
-                    <strong><a href="https://phillipi.github.io/prh/">Platonic Representation Hypothesis
-                            (PRH)</a>:</strong> <a href="https://arxiv.org/abs/2405.07987">Huh et al. (2024)</a>
-                    proposed that models converge toward a shared statistical reality. Our framework tests this by
-                    aligning unimodal encoders into a common latent space.
-                </li>
-                <li>
-                    <strong><a href="https://openai.com/index/clip/">CLIP</a>:</strong> <a
-                        href="https://arxiv.org/abs/2103.00020">Radford et al. (2021)</a> introduced joint multimodal
-                    representations using contrastive learning. Unlike CLIP, our method aligns frozen encoders post hoc,
-                    improving scalability.
-                </li>
-                <li>
-                    <strong>Linear Mapping for Cross-Modal Tasks:</strong> <a
-                        href="https://arxiv.org/abs/2209.15162">Merullo et al. (2022)</a> showed that simple linear
-                    adapters can align visual and text representations, inspiring our lightweight adapter approach.
-                </li>
-                <li>
-                    <strong>DINOv2:</strong> <a href="https://arxiv.org/abs/2304.07193">Oquab et al. (2023)</a>
-                    introduced DINOv2, a vision transformer producing robust embeddings. We use DINOv2-small as a
-                    benchmark for evaluating our aligned representations.
-                </li>
-                <li>
-                    <strong>Contrastive Learning Theory:</strong> <a href="https://arxiv.org/abs/2005.10242">Wang and
-                        Isola (2020)</a> provided insights into contrastive objectives, informing our use of
-                    dual-encoder contrastive loss to drive alignment.
-                </li>
-            </ol>
-        </section>
-
-        <section id="hypothesis">
-            <h2>Hypothesis</h2>
-            <p>
-                Our work is grounded in the following hypotheses:
-            </p>
-            <ul>
-                <li>
-                    A shared latent space exists where unimodal representations from different encoders can be aligned
-                    through linear transformations.
-                </li>
-                <li>
-                    Aligning these representations produces embeddings that closely approximate those of performant
-                    models, such as DINOv2, as measured by kernel alignment metrics.
-                </li>
-                <li>
-                    Multimodal alignment captures mechanisms of representation convergence, providing empirical evidence
-                    for the Platonic Representation Hypothesis.
-                </li>
-            </ul>
-        </section>
-
-
-
-        <section id="mathematical-framework">
+        <!-- <section id="mathematical-framework">
             <h2>Mathematical Framework</h2>
             <p>
                 At the core of our project is the hypothesis that pre-trained unimodal representations can be aligned
@@ -563,7 +453,244 @@
                 greater than either its parts (unimodal representations) alone,
             </p>
 
+        </section> -->
+
+        <section id="introduction">
+            <h2>Introduction</h2>
+            <p>
+                Deep learning models transform raw data into task-specific representations. Recently, two key research
+                areas have deepened our understanding of these representations. The <strong>CLIP framework</strong>
+                demonstrated the power of aligning image and text representations via paired data. The <strong>Platonic
+                    Representation Hypothesis</strong> posits that well-performing models converge toward a shared
+                statistical model of reality in their latent spaces.
+            </p>
+            <p>
+                This project bridges these ideas by exploring whether representations from pre-trained unimodal neural
+                networks (e.g., ResNet-18 for images and DistilBERT for text) can be aligned into a shared multimodal
+                latent space. Inspired by CLIP's joint embedding approach and the Platonic Representation Hypothesis, we
+                use frozen encoders with lightweight adapters to achieve alignment without retraining larger models like
+                DINOv2. This enables efficient scalability to new modalities.
+            </p>
+            <figure>
+                <img src="figures/conceptual_contrastive.svg" alt="Conceptual Multimodal Alignment"
+                    style="width: 100%; max-width: 1200px; margin: 0 auto;">
+                <figcaption>
+                    <strong>Figure 1.</strong> Conceptual illustration of our multimodal alignment framework.
+                    Representations from ResNet-18 (images) and DistilBERT (text) are aligned using lightweight
+                    adapters. Matching image-caption pairs are pulled together, while non-matching pairs are pushed
+                    apart.
+                </figcaption>
+            </figure>
         </section>
+
+        <section id="motivation">
+            <h3>Motivation</h3>
+            <p>
+                Our approach is motivated by three key insights:
+            </p>
+            <ol>
+                <li>
+                    <strong>Inspiration from CLIP:</strong> CLIP demonstrated that cross-modal representations can be
+                    aligned using paired data and contrastive learning. However, joint training limits scalability to
+                    new modalities. Our method decouples the encoders, aligning their outputs via lightweight adapters.
+                </li>
+                <li>
+                    <strong>Testing the Platonic Representation Hypothesis:</strong> This hypothesis suggests that
+                    models converge toward a shared statistical model of reality. Aligning diverse unimodal encoders
+                    tests whether this convergence can be explicitly achieved.
+                </li>
+                <li>
+                    <strong>Scalability and Modularity:</strong> By aligning frozen encoders post hoc, our framework
+                    supports efficient integration of new modalities without the need for extensive joint training.
+                </li>
+            </ol>
+        </section>
+
+        <section id="related-work">
+            <h2>Related Work</h2>
+            <p>
+                Our project builds on key advances in multimodal learning and theoretical insights:
+            </p>
+            <ol>
+                <li>
+                    <strong><a href="https://phillipi.github.io/prh/">Platonic Representation Hypothesis
+                            (PRH)</a>:</strong> <a href="https://arxiv.org/abs/2405.07987">Huh et al. (2024)</a>
+                    proposed that models converge toward a shared statistical reality. Our framework tests this by
+                    aligning unimodal encoders into a common latent space.
+                </li>
+                <li>
+                    <strong><a href="https://openai.com/index/clip/">CLIP</a>:</strong> <a
+                        href="https://arxiv.org/abs/2103.00020">Radford et al. (2021)</a> introduced joint multimodal
+                    representations using contrastive learning. Unlike CLIP, our method aligns frozen encoders post hoc,
+                    improving scalability.
+                </li>
+                <li>
+                    <strong>Linear Mapping for Cross-Modal Tasks:</strong> <a
+                        href="https://arxiv.org/abs/2209.15162">Merullo et al. (2022)</a> showed that simple linear
+                    adapters can align visual and text representations, inspiring our lightweight adapter approach.
+                </li>
+                <li>
+                    <strong>DINOv2:</strong> <a href="https://arxiv.org/abs/2304.07193">Oquab et al. (2023)</a>
+                    introduced DINOv2, a vision transformer producing robust embeddings. We use DINOv2-small as a
+                    benchmark for evaluating our aligned representations.
+                </li>
+                <li>
+                    <strong>Contrastive Learning Theory:</strong> <a href="https://arxiv.org/abs/2005.10242">Wang and
+                        Isola (2020)</a> provided insights into contrastive objectives, informing our use of
+                    dual-encoder contrastive loss to drive alignment.
+                </li>
+            </ol>
+        </section>
+
+        <section id="hypothesis">
+            <h2>Hypothesis</h2>
+            <p>
+                Our work is grounded in the following hypotheses:
+            </p>
+            <ul>
+                <li>
+                    A shared latent space exists where unimodal representations from different encoders can be aligned
+                    through linear transformations.
+                </li>
+                <li>
+                    Aligning these representations produces embeddings that closely approximate those of performant
+                    models, such as DINOv2, as measured by kernel alignment metrics.
+                </li>
+                <li>
+                    Multimodal alignment captures mechanisms of representation convergence, providing empirical evidence
+                    for the Platonic Representation Hypothesis.
+                </li>
+            </ul>
+        </section>
+
+        <section id="mathematical-framework">
+            <h2>Mathematical Framework</h2>
+            <p>
+                At the core of our project is the hypothesis that pre-trained unimodal representations can be aligned
+                into a shared multimodal latent space. This section formalizes the mathematical structure underlying our
+                framework, detailing how representations are extracted, aligned, and evaluated.
+            </p>
+
+            <h3>Multimodal Data Representation</h3>
+            <p>
+                Let the world generate raw multimodal data:
+            </p>
+            <p>
+                \[
+                \mathcal{D}_\text{world} = \left\{\left(\theta^{(i)}, \psi^{(i)}, \phi^{(i)}, \dots
+                \right)\right\}_{i=1}^N,
+                \quad \theta \in \mathcal{\Theta}, \psi \in \mathcal{\Psi}, \phi \in \mathcal{\Phi}, \dots
+                \]
+            </p>
+            <p>
+                where \( \mathcal{\Theta}, \mathcal{\Psi}, \mathcal{\Phi} \) represent different modalities (e.g.,
+                image, text, audio),
+                and \( \theta, \psi, \phi \) are specific instances of these modalities.
+            </p>
+            <p>
+                For simplicity, we focus on a two-modality setting with images (\( \mathcal{X} \)) and text (\(
+                \mathcal{Y} \)):
+            </p>
+            <p>
+                \[
+                \mathcal{D}_\text{world} = \left\{\left(x^{(i)}, y^{(i)}\right)\right\}_{i=1}^N, \quad x \in
+                \mathcal{X}, y \in \mathcal{Y}.
+                \]
+            </p>
+            <figure>
+                <img src="figures/platonic_representation.svg" alt="Platonic Representation Hypothesis"
+                    style="width: 80%; max-width: 1200px; margin: 0 auto;">
+                <figcaption>
+                    <strong>Figure 2.</strong> Conceptual illustration of the connection between the Platonic
+                    Representation Hypothesis (PRH) and our project framework.
+                    Representations from different modalities (e.g., images, text) are hypothesized to converge toward a
+                    shared statistical model — the Platonic representation.
+                    Our framework uses contrastive learning to explicitly align these representations into a shared
+                    latent space, approximating this convergence.
+                </figcaption>
+            </figure>
+
+            <h3>Learned Adapters</h3>
+            <p>
+                We use frozen pre-trained encoders to extract representations from each modality:
+            </p>
+            <p>
+                \[
+                X_\text{enc}: \mathcal{X} \rightarrow \mathbb{R}^{d_x}, \quad Y_\text{enc}: \mathcal{Y} \rightarrow
+                \mathbb{R}^{d_y},
+                \]
+            </p>
+            <p>
+                where \( d_x \) and \( d_y \) are the embedding dimensions for images and text, respectively.
+            </p>
+            <p>
+                To project these representations into a shared latent space \( \mathbb{R}^{d_e} \), we introduce learned
+                adapters:
+            </p>
+            <p>
+                \[
+                W_x : \mathbb{R}^{d_x} \rightarrow \mathbb{R}^{d_e}, \quad W_y : \mathbb{R}^{d_y} \rightarrow
+                \mathbb{R}^{d_e}.
+                \]
+            </p>
+            <p>
+                We explore both <strong>linear adapters</strong> and <strong>2-layer MLP adapters</strong>. The adapted
+                encoders are defined as:
+            </p>
+            <p>
+                \[
+                \begin{aligned}
+                f_\text{image}: \mathcal{X} \rightarrow \mathbb{R}^{d_e}, \quad f_\text{image} &= W_x \circ
+                X_\text{enc}, \\
+                g_\text{text}: \mathcal{Y} \rightarrow \mathbb{R}^{d_e}, \quad g_\text{text} &= W_y \circ Y_\text{enc}.
+                \end{aligned}
+                \]
+            </p>
+            <p>
+                Thus, \( f_\text{image} \) and \( g_\text{text} \) map images and text, respectively, to the shared
+                latent space \( \mathbb{R}^{d_e} \).
+            </p>
+
+            <h3>Dual-Encoder Contrastive Objective</h3>
+            <p>
+                To align the representations, we use a <strong>dual-encoder contrastive loss</strong>:
+            </p>
+            <p>
+                \[
+                \mathcal{L}_{\text{contrastive}} = -\frac{1}{N} \sum_{i=1}^N \log
+                \frac{\exp\left(f_\text{image}(x^{(i)}) \cdot g_\text{text}(y^{(i)}) / \tau\right)}{\sum_{j=1}^N
+                \exp\left(f_\text{image}(x^{(i)}) \cdot g_\text{text}(y^{(j)}) / \tau\right)},
+                \]
+            </p>
+            <p>
+                where \( \tau \) is the temperature parameter that scales the similarity scores.
+            </p>
+            <p>
+                Our approach creatively generalizes the notion of contrastive "views" from augmentations of a single
+                modality to distinct modalities. Here, images and text serve as distinct views of an underlying Platonic
+                reality, aligning with the <strong>Platonic Representation Hypothesis</strong>.
+            </p>
+
+            <h3>Connection to PRH</h3>
+            <p>
+                The <strong>Platonic Representation Hypothesis (PRH)</strong> posits that representations from different
+                modalities converge toward a shared Platonic representation. Our framework hypothesizes that
+                <strong>contrastive alignment</strong> between image and text encoders can drive this convergence.
+            </p>
+            <p>
+                In practice, we define the <strong>aligned multimodal encoder</strong> \( h_\text{multi} \) as:
+            </p>
+            <p>
+                \[
+                h_\text{multi}(x, y) = \lambda \cdot f_{\text{image}}(x) + (1 - \lambda) \cdot g_{\text{text}}(y),
+                \]
+            </p>
+            <p>
+                where \( \lambda \in [0, 1] \) is a learnable hyperparameter controlling the balance between image and
+                text embeddings.
+            </p>
+        </section>
+
 
         <section id="methodology">
             <h2>Methodology</h2>
