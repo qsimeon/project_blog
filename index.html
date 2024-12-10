@@ -518,7 +518,7 @@
                 <li><strong>Adapters \( \left( W_x, W_y \right) \):</strong>
                     <ul>
                         <li>Linear Adapter: Matrix multiplication plus bias term.</li>
-                        <li>MLP Adapter: Two-layer MLP with GELU and LayerNorm.</li>
+                        <li>MLP Adapter: 2-layer MLP with GELU and LayerNorm.</li>
                         <li>Output dimension: \( d_e = 768 \).</li>
                     </ul>
                 </li>
@@ -649,38 +649,43 @@
                     </figcaption>
                 </figure>
 
-                <h3>Key Hypotheses Supported</h4>
-                    <p>
-                        Our results show that both the weak and strong hypotheses are supported. This indicates that the
-                        multimodal representations, which incorporate both image and text information, are more closely
-                        aligned
-                        with the DINOv2 embeddings than either the image or text representations alone.
-                    </p>
+                <h3>Key Hypotheses Supported</h3>
 
-                    <figure>
-                        <img src="figures/key_hypothesis_results.svg" alt="Key Hypothesis Results"
-                            style="width: 100%; height: auto;">
-                        <figcaption>
-                            <strong>Figure 5.</strong> The mutual-KNN kernel alignment metric for the aligned multimodal
-                            kernel
-                            surpasses both the average and the best of the unimodal kernels, supporting both the weak
-                            and
-                            strong hypotheses for both adapter types.
-                        </figcaption>
-                    </figure>
+                <p>
+                    Our results show that both the weak and strong hypotheses are supported. This indicates that the
+                    multimodal representations, which incorporate both image and text information, are more closely
+                    aligned with the DINOv2 embeddings than either the image or text representations alone.
+                </p>
 
-                    <p>
-                        This result is particularly compelling given that DINOv2 is a self-supervised vision model
-                        trained
-                        <em>without any text supervision</em>. The fact that multimodal alignment with text leads to
-                        representations
-                        that are more similar to DINOv2, we believe, supports the <strong>Platonic Representation
-                            Hypothesis</strong> —
-                        suggesting a shared statistical model of reality across modalities.
-                    </p>
+                <p>
+                    Importantly, our multimodal encoder was not trained to match DINOv2-small outputs. Our contrastive
+                    objective did not involve DINOv2 during training. Therefore, the fact that the aligned multimodal
+                    representations are more similar to DINOv2 than the image encoder alone suggests that the alignment
+                    is not a trivial consequence of the image encoder's similarity to DINOv2. This reinforces the value
+                    of multimodal alignment and supports the Platonic Representation Hypothesis.
+                </p>
+
+                <figure>
+                    <img src="figures/key_hypothesis_results.svg" alt="Key Hypothesis Results"
+                        style="width: 150%; height: auto;">
+                    <figcaption>
+                        <strong>Figure 5.</strong> The mutual-KNN kernel alignment metric for the aligned multimodal
+                        kernel surpasses both the average and the best of the unimodal kernels, supporting both the weak
+                        and strong hypotheses for both adapter types.
+                    </figcaption>
+                </figure>
+
+                <p>
+                    This result is particularly compelling given that DINOv2 is a self-supervised vision model
+                    trained
+                    <em>without any text supervision</em>. The fact that multimodal alignment with text leads to
+                    representations
+                    that are more similar to DINOv2, we believe, supports the <strong>Platonic Representation
+                        Hypothesis</strong> —
+                    suggesting a shared statistical model of reality across modalities.
+                </p>
 
         </section>
-
 
         <section id="discussion">
             <h2>Discussion</h2>
@@ -692,16 +697,13 @@
                 Specifically, we observed that aligning image and text embeddings via contrastive learning leads to
                 multimodal representations that are more closely aligned with the DINOv2-small features compared to
                 unimodal representations alone.
-            </p>
-
-            <h3>Key Insights</h3>
-
-            <p>
-                Our approach was inspired by the <strong>CLIP framework</strong> (Radford et al., 2021), which
+                Our alignment approach was inspired by the <strong>CLIP framework</strong> (Radford et al., 2021), which
                 demonstrated the power of aligning cross-modal representations using paired image-text data. Unlike
                 CLIP, which requires joint training of encoders, our method achieves alignment post hoc with frozen
                 encoders and lightweight adapters, providing a scalable alternative.
             </p>
+
+            <h3>Key Insights</h3>
 
             <p>
                 Our experiments revealed three key insights:
@@ -719,22 +721,36 @@
                 </li>
 
                 <li>
-                    <strong>Empirical Support for Key Hypotheses:</strong>
-                    Our results validated both the <strong>weak</strong> and <strong>strong hypotheses</strong>
-                    formulated in the mathematical framework. The aligned multimodal kernel \(K_{\text{align}}\)
-                    consistently surpassed the average and the best of the unimodal kernels (\(K_X\) and \(K_Y\)),
-                    highlighting that the combined information from multiple modalities can lead to representations that
-                    better approximate those of performant models.
+                    <strong>Creative Reformulation of Contrastive Views:</strong>
+                    Our use of the dual-encoder contrastive objective generalizes the traditional notion of “views” from
+                    single-modality augmentations to different modalities representing distinct views of a hypothesized
+                    common underlying reality. This reformulation, inspired by the Platonic Representation Hypothesis,
+                    is a unique perspective that distinguishes our framework from conventional contrastive learning
+                    approaches.
                 </li>
 
                 <li>
-                    <strong>Efficiency and Modularity:</strong>
-                    By using <strong>frozen pre-trained encoders</strong> and lightweight adapters, our method achieves
-                    efficient multimodal alignment without the need for joint end-to-end training. This modular approach
-                    allows for straightforward integration of additional modalities, such as audio, making it a scalable
-                    solution for future multimodal systems.
+                    <strong>Empirical Support for Key Hypotheses:</strong>
+                    Our results validated both the <strong>weak</strong> and <strong>strong hypotheses</strong>
+                    formulated in the mathematical framework. The aligned multimodal kernel \( K_{\text{align}} \)
+                    consistently surpassed the average and the best of the unimodal kernels (\( K_X \) and \( K_Y \)),
+                    highlighting that the combined information from multiple modalities can lead to representations that
+                    better approximate those of performant models.
                 </li>
             </ul>
+
+            <h3>Non-Trivial Alignment to DINOv2</h3>
+
+            <p>
+                Notably, our multimodal encoder was not explicitly optimized to produce embeddings that match those from
+                the DINOv2-small feature extractor. The dual-encoder contrastive loss we used does not include DINOv2 in
+                any way. This makes it compelling that the representations produced by our aligned encoder \(
+                h_{\text{multi}}(x, y) \) are <em>more similar</em> to DINOv2-small embeddings than the unimodal image
+                encoder alone. This refutes the possibility that the multimodal encoder is simply regurgitating the
+                image encoder's output and ignoring the text modality. The results demonstrate the true benefit of
+                multimodal alignment.
+            </p>
+
 
             <h3>Potential Limitations</h3>
 
