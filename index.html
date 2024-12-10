@@ -499,7 +499,7 @@
                 </li>
             </ul>
             <details>
-                <summary><em>Expand for schematic of data pipeline.</em>.</summary>
+                <summary><em>Expand for schematic of data pipeline.</em></summary>
                 <img src="figures/data_pipeline.jpg" alt="Data Pipeline">
             </details>
 
@@ -542,14 +542,13 @@
                 <li><strong>Weight Decay:</strong> 0.01.</li>
             </ul>
             <details>
-                <summary><em>Expand for schematic of training pipeline.</em>.</summary>
+                <summary><em>Expand for schematic of training pipeline.</em></summary>
                 <img src="figures/training_pipeline.jpg" alt="Training Pipeline">
             </details>
 
             <h3>Evaluation Metrics</h3>
             <p>
-                We evaluate the alignment performance for the two types of adapters:
-
+                We evaluate the alignment performance for the two types of adapters
                 using the <strong>mutual-KNN kernel alignment metric</strong> \( m \).
                 Specifically, we compute the following three metrics:
             </p>
@@ -578,7 +577,7 @@
             </p>
             <ul>
                 <li>
-                    <strong>Weak Hypothesis:</strong> The aligned multimodal kernel achieves higher similarity
+                    <strong>Weak Hypothesis \(H_1\):</strong> The aligned multimodal kernel achieves higher similarity
                     with
                     the DINOv2 kernel than the average of the unimodal kernels:
                     \[
@@ -587,7 +586,7 @@
                     \]
                 </li>
                 <li>
-                    <strong>Strong Hypothesis:</strong> The aligned multimodal kernel surpasses even the best
+                    <strong>Strong Hypothesis \(H_2\):</strong> The aligned multimodal kernel surpasses even the best
                     unimodal
                     kernel:
                     \[
@@ -596,13 +595,8 @@
                     \]
                 </li>
             </ul>
-
-            <ul>
-                <li><strong>\(H_1\)</strong>: Aligned multimodal kernel exceeds average unimodal alignment.</li>
-                <li><strong>\(H_2\)</strong>: Aligned multimodal kernel exceeds the best unimodal alignment.</li>
-            </ul>
             <details>
-                <summary><em>Expand for schematic of hypothesis testing.</em>.</summary>
+                <summary><em>Expand for schematic of hypothesis testing.</em></summary>
                 <img src="figures/hypothesis_test.jpg" alt="Hypothesis Testing">
             </details>
         </section>
@@ -622,7 +616,7 @@
                     <img src="figures/kernel_metric_barplot.svg" alt="Kernel Metric Bar Plot"
                         style="width: 100%; height: auto;">
                     <figcaption>
-                        <strong>Figure.</strong> Bar plot showing the mutual-KNN kernel alignment metric before and
+                        <strong>Figure 3.</strong> Bar plot showing the mutual-KNN kernel alignment metric before and
                         after
                         training for the linear (left) and MLP (right) adapters. For both adapter types and
                         all encoders, kernel alignment to the DINOv2-small encoder improves after training with the
@@ -647,7 +641,7 @@
                     <img src="figures/pca_alignment.svg" alt="PCA Alignment Visualization"
                         style="width: 100%; height: auto;">
                     <figcaption>
-                        <strong>Figure.</strong> PCA plots of the DINOv2 embeddings (blue) and aligned multimodal
+                        <strong>Figure 4.</strong> PCA plots of the DINOv2 embeddings (blue) and aligned multimodal
                         representations (yellow)
                         at the first epoch (left) and last epoch (right) of training. The multimodal representations
                         become
@@ -667,7 +661,7 @@
                         <img src="figures/key_hypothesis_results.svg" alt="Key Hypothesis Results"
                             style="width: 100%; height: auto;">
                         <figcaption>
-                            <strong>Figure.</strong> The mutual-KNN kernel alignment metric for the aligned multimodal
+                            <strong>Figure 5.</strong> The mutual-KNN kernel alignment metric for the aligned multimodal
                             kernel
                             surpasses both the average and the best of the unimodal kernels, supporting both the weak
                             and
