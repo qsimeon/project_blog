@@ -44,7 +44,7 @@
             </p>
             <figure>
                 <img src="figures/conceptual_contrastive.svg" alt="Conceptual Multimodal Alignment"
-                    style="width: 200%; height: auto;">
+                    style="width: 100%; height: auto;">
                 <figcaption>
                     <strong>Figure 1.</strong> Conceptual illustration of our multimodal alignment framework. Image
                     representations (from ResNet-18) and text representations (from GPT-2) are aligned into a shared
@@ -114,7 +114,8 @@
                     for evaluating the quality of our aligned multimodal representations.
                 </li>
                 <li>
-                    <strong>Contrastive Representation Learning:</strong> Wang and Isola (2020) provided theoretical
+                    <strong><a href="https://arxiv.org/abs/2005.10242"></a>Contrastive Representation
+                        Learning</strong>a>:</strong> Wang and Isola (2020) provided theoretical
                     insights into
                     contrastive learning by analyzing alignment and uniformity on the hypersphere. Their work shows that
                     contrastive
@@ -177,7 +178,7 @@
             </p>
             <figure>
                 <img src="figures/platonic_representation.svg" alt="Platonic Representation Hypothesis"
-                    style="width: 150%; height: auto;">
+                    style="width: 80%; height: auto;">
                 <figcaption>
                     <strong>Figure 2.</strong> Illustration of the Platonic Representation Hypothesis (PRH).
                     Representations from different modalities (e.g., images, text) are hypothesized to converge toward a
@@ -461,10 +462,16 @@
                 </li>
             </ul>
             <figure>
-                <img src="figures/data_pipeline.jpg" alt="Data Pipeline">
-                <figcaption><strong>Figure.</strong> Schematic/flow chart diagram illustraing our data pipeline which
-                    preprocesses images and text for input into the
-                    model.</figcaption>
+                <img src="figures/data_pipeline.jpg" alt="Data Pipeline for Multimodal Preprocessing">
+                <figcaption><strong>Figure 3.</strong> This schematic illustrates the data pipeline used to preprocess
+                    paired images and captions from the Flickr30k dataset. On the left, raw images are resized to
+                    224x224, converted to tensors, and normalized using ImageNet statistics to create image batches
+                    suitable for the ResNet-18 encoder. On the right, raw captions are tokenized using the DistilBERT
+                    tokenizer, padded, and converted to tensors for the DistilBERT encoder. Both image and text batches
+                    are loaded into the DataLoader with a batch size of 128, split into 75% for training and 25% for
+                    validation, optimizing GPU utilization for efficient processing.
+
+                </figcaption>
             </figure>
 
             <h3>Model Architecture</h3>
@@ -503,17 +510,6 @@
                 such as image classification or visual question answering.
             </p>
 
-            <figure>
-                <img src="figures/img_txt_concept.svg" alt="Multimodal Alignment Architecture">
-                <figcaption><strong>Figure.</strong> Conceptual illustration of our approach to using frozen
-                    pretrained encoders to map single modalities (image and text) into shared latent space.
-                    We encode image and text pairs using frozen pretrained ResNet-18 and DistilBERT encoders. We use
-                    learnable adapters to map from the dimensions of the embeddings of these frozen encoders to a the
-                    dimension of the shared multimodal latent space which is set to be equal to the emdedding dimension
-                    of a performant model.
-                </figcaption>
-            </figure>
-
             <h3>Training Procedure</h3>
             <p>
                 We train the adapters for <strong>15 epochs</strong> using a dual-encoder contrastive loss with
@@ -543,9 +539,14 @@
 
 
             <figure>
-                <img src="figures/training_pipeline.jpg" alt="Training Procedure Diagram">
-                <figcaption><strong>Figure.</strong> Schematic/flow chart diagram of our training piepline starting from
-                    the processing of the inputs (images and text captions) to the computation of the contrastive loss.
+                <img src="figures/training_pipeline.jpg" alt="Training Pipeline with Dual-Encoder Contrastive Loss">
+                <figcaption><strong>Figure 4.</strong> A schematic of the complete training pipeline for aligning image
+                    and text representations. Images and captions are processed through the respective frozen ResNet-18
+                    and DistilBERT encoders. The resulting features are projected into a shared latent space using
+                    adapters. The representations are normalized and used to compute the similarity between matching and
+                    non-matching pairs. The dual-encoder contrastive loss encourages matching pairs to have higher
+                    similarity and non-matching pairs to be pushed apart. The loss combines contrastive learning with
+                    distribution matching, facilitating effective multimodal alignment.
                 </figcaption>
             </figure>
 
@@ -567,9 +568,14 @@
             </ul>
 
             <figure>
-                <img src="figures/hypothesis_test.jpg" alt="Hypothesis Test Diagram">
-                <figcaption><strong>Figure.</strong> We test our key hypothesis by comparing the kernel alignment
-                    metric of the aligned multimodal kernel to the unimodal kernels and the DinoV2 kernel.
+                <img src="figures/hypothesis_test.jpg" alt="Hypothesis Testing via Kernel Alignment Metrics">
+                <figcaption><strong>Figure 5.</strong> This diagram outlines the hypothesis testing process using kernel
+                    alignment metrics. Features are extracted from images and text using the respective encoders and
+                    adapters, as well as from the DINOv2-small model as a performant reference. Kernels are computed for
+                    the image, text, and aligned multimodal representations. The alignment metrics test two hypotheses:
+                    whether the aligned multimodal kernel surpasses the average unimodal alignment (H1) and whether it
+                    surpasses the best unimodal alignment (H2). Improvement margins are computed to verify these
+                    hypotheses, providing evidence for the effectiveness of multimodal alignment.
                 </figcaption>
             </figure>
         </section>
