@@ -235,8 +235,7 @@
             <h3>Kernel Alignment Metric</h3>
 
             <p>
-                We evaluate the alignment using the <strong>mutual-KNN kernel alignment metric</strong> \( m \). Given
-                the kernels:
+                Given the kernels:
             </p>
             <ul>
                 <li>\( K_X(i, j) = \langle f_{\text{image}}(x^{(i)}), f_{\text{image}}(x^{(j)}) \rangle \)</li>
@@ -247,24 +246,28 @@
             </ul>
 
             <p>
-                We will test two key hypotheses:
+                We evaluate alignment performance using the <strong>mutual-KNN kernel alignment metric</strong> \( m \).
             </p>
 
+            <p>
+                Specifically, we compute the following values:
+            </p>
             <ul>
-                <li><strong>Weak Hypothesis (\( H_1 \)):</strong> The aligned multimodal kernel achieves higher
-                    similarity with the DINOv2 kernel than the average of the unimodal kernels:
-                    \[
-                    m(K_{\text{align}}, K_{\text{DINOv2}}) > \text{avg}(m(K_X, K_{\text{DINOv2}}), m(K_Y,
-                    K_{\text{DINOv2}})).
-                    \]
-                </li>
-                <li><strong>Strong Hypothesis (\( H_2 \)):</strong> The aligned multimodal kernel surpasses even the
-                    best unimodal kernel:
-                    \[
-                    m(K_{\text{align}}, K_{\text{DINOv2}}) > \max(m(K_X, K_{\text{DINOv2}}), m(K_Y, K_{\text{DINOv2}})).
-                    \]
-                </li>
+                <li><strong>Unimodal Alignment:</strong></li>
+                <ul>
+                    <li>\( m(K_X, K_{\text{DINOv2}}) \): Alignment of the image encoder \( f_\text{image} \) kernel with
+                        the DINOv2 kernel.</li>
+                    <li>\( m(K_Y, K_{\text{DINOv2}}) \): Alignment of the text encoder \( g_\text{text} \) kernel with
+                        the DINOv2 kernel.</li>
+                </ul>
+                <li><strong>Multimodal Alignment:</strong></li>
+                <ul>
+                    <li>\( m(K_{\text{align}}, K_{\text{DINOv2}}) \): Alignment of the multimodal encoder \(
+                        h_\text{multi} \) kernel with the DINOv2 kernel.</li>
+                </ul>
             </ul>
+
+
         </section>
 
 
@@ -346,35 +349,36 @@
                 <li><strong>Weight Decay:</strong> 0.01.</li>
             </ul>
 
+            <details>
+                <summary><em>Expand for schematic of training pipeline.</em></summary>
+                <img src="figures/training_pipeline.svg" alt="Training Pipeline" style="width: 100%; max-width: 800px;">
+            </details>
+
             <h3>Evaluation Metrics</h3>
+
             <p>
-                We evaluate alignment performance using the <strong>mutual-KNN kernel alignment metric</strong> \( m \).
-                Specifically, we compute the following values:
+                We will test <strong>two key hypotheses</strong> based on the metrics we described in the Mathematical
+                Framework:
             </p>
+
             <ul>
-                <li><strong>Unimodal Alignment:</strong></li>
-                <ul>
-                    <li>\( m(K_X, K_{\text{DINOv2}}) \): Alignment of the image encoder \( f_\text{image} \) kernel with
-                        the DINOv2 kernel.</li>
-                    <li>\( m(K_Y, K_{\text{DINOv2}}) \): Alignment of the text encoder \( g_\text{text} \) kernel with
-                        the DINOv2 kernel.</li>
-                </ul>
-                <li><strong>Multimodal Alignment:</strong></li>
-                <ul>
-                    <li>\( m(K_{\text{align}}, K_{\text{DINOv2}}) \): Alignment of the multimodal encoder \(
-                        h_\text{multi} \) kernel with the DINOv2 kernel.</li>
-                </ul>
+                <li><strong>Weak Hypothesis (\( H_1 \)):</strong> The aligned multimodal kernel achieves higher
+                    similarity with the DINOv2 kernel than the average of the unimodal kernels:
+                    \[
+                    m(K_{\text{align}}, K_{\text{DINOv2}}) > \text{avg}(m(K_X, K_{\text{DINOv2}}), m(K_Y,
+                    K_{\text{DINOv2}})).
+                    \]
+                </li>
+                <li><strong>Strong Hypothesis (\( H_2 \)):</strong> The aligned multimodal kernel surpasses even the
+                    best unimodal kernel:
+                    \[
+                    m(K_{\text{align}}, K_{\text{DINOv2}}) > \max(m(K_X, K_{\text{DINOv2}}), m(K_Y, K_{\text{DINOv2}})).
+                    \]
+                </li>
             </ul>
-
-            <p>
-                We test the <strong>two key hypotheses</strong> by comparing these alignment metrics as described in the
-                Mathematical
-                Framework.
-            </p>
-
             <details>
                 <summary><em>Expand for schematic of hypothesis testing.</em></summary>
-                <img src="figures/hypothesis_test.jpg" alt="Hypothesis Testing" style="width: 100%; max-width: 800px;">
+                <img src="figures/hypothesis_test.svg" alt="Hypothesis Testing" style="width: 100%; max-width: 800px;">
             </details>
         </section>
 
