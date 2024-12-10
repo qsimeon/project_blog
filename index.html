@@ -30,10 +30,9 @@
                 This project bridges these ideas by exploring whether representations from disparate pre-trained
                 unimodal neural networks can be aligned into a shared multimodal latent space, inspired by the joint
                 embedding approach of CLIP and motivated by the convergence hypothesis of Platonic Representations. The
-                proposed framework uses frozen unimodal encoders (e.g., ResNet-18 for images, DistilBERT for text)
-                with
-                learned linear adapters to align representations across modalities. Our aim is to determine if such
-                aligned representations better approximate those of larger, more performant models (e.g., DINOv2).
+                proposed framework uses frozen unimodal encoders with learned linear adapters to align representations
+                across modalities. Our aim is to determine if such aligned representations better approximate those of
+                larger, more performant models.
             </p>
             <p>
                 Inspired by the success of CLIP in aligning representations across modalities and the theoretical
@@ -113,9 +112,8 @@
                 <li>
                     <strong>DINOv2:</strong> <a href="https://arxiv.org/abs/2304.07193">Oquab et al. (2023)</a>
                     introduced DINOv2, a self-supervised vision transformer
-                    model that generates robust embeddings. As our performant reference model, DINOv2-small provides a
-                    benchmark
-                    for evaluating the quality of our aligned multimodal representations.
+                    model that generates robust embeddings. As our performant reference model, we use DINOv2-small to
+                    provide a benchmark for evaluating the quality of our aligned multimodal representations.
                 </li>
                 <li>
                     <strong>Contrastive Representation Learning:</strong>
@@ -472,8 +470,7 @@
                 <strong><a href="https://huggingface.co/datasets/nlphuji/flickr30k">Flickr30k</a></strong> dataset,
                 which contains paired image-caption samples. Each image in Flickr30k dataset is
                 associated with 5 captions, but we use only the first caption so that we have a single postive pair per
-                data point \( x^{(i)}, y^{(i)} \)
-                corresponding to our <a href="#mathematical-framework">Mathematical Framework</a>.
+                data point \( x^{(i)}, y^{(i)} \).
             </p>
             <ul>
                 <li><strong>Image Processing:</strong>
@@ -527,7 +524,7 @@
             <h3>Training Procedure</h3>
             <p>
                 We train the adapters to align image and text representations using the dual-encoder
-                contrastive loss outlined in the <a href="#mathematical-framework">Mathematical Framework</a>.
+                contrastive loss.
                 Both <strong>linear </strong> and <strong>2-layer MLP</strong> adapters are trained for <strong>15
                     epochs</strong> on the <strong>Flickr30k</strong> dataset
                 using a temperature scaling value of \( \tau = 0.07 \) in the contrastive loss. Other releavnt
@@ -548,8 +545,8 @@
             <h3>Evaluation Metrics</h3>
             <p>
                 We evaluate the alignment performance for the two types of adapters
-                using the <strong>mutual-KNN kernel alignment metric</strong> \( m \).
-                Specifically, we compute the following three metrics:
+                using the <strong>mutual-KNN</strong> kernel alignment metric \( m \).
+                Specifically, we compute the following three values:
             </p>
             <ul>
                 <li><strong>Unimodal Alignment</strong>:</li>
@@ -571,8 +568,7 @@
                 </ol>
             </ul>
 
-            <p>We use these metrics to test the two <strong>key hypotheses</strong> stated in our <a
-                    href="#mathematical-framework">Mathematical Framework</a>:
+            <p>We use these values to test our two <strong>key hypotheses</strong>:
             </p>
             <ul>
                 <li>
@@ -611,13 +607,12 @@
                     contrastive alignment objective effectively aligns the image and text representations.
                 </p>
 
-                <figure>
-                    <img src="figures/kernel_metric_barplot.svg" alt="Kernel Metric Bar Plot"
+                <figure style="width: 100%; max-width: 1200px; margin: 0 auto;">
+                    <img src="figures/kernel_metric_barplot.jpg" alt="Kernel Metric Bar Plot"
                         style="width: 100%; height: auto;">
                     <figcaption>
                         <strong>Figure 3.</strong> Bar plot showing the mutual-KNN kernel alignment metric before and
-                        after
-                        training for the linear (left) and MLP (right) adapters. For both adapter types and
+                        after training for the (A) linear and (B) MLP adapters. For both adapter types and
                         all encoders, kernel alignment to the DINOv2-small encoder improves after training with the
                         dual encoder contrastive objective.
                     </figcaption>
@@ -636,15 +631,16 @@
                     to become more aligned with the DINOv2 embeddings.
                 </p>
 
-                <figure>
+                <figure style="width: 100%; max-width: 1200px; margin: 0 auto;">
                     <img src="figures/pca_alignment.svg" alt="PCA Alignment Visualization"
                         style="width: 100%; height: auto;">
                     <figcaption>
-                        <strong>Figure 4.</strong> PCA plots of the DINOv2 embeddings (blue) and aligned multimodal
-                        representations (yellow)
-                        at the first epoch (left) and last epoch (right) of training. The multimodal representations
-                        become
-                        progressively more aligned with the DINOv2 embeddings during training.
+                        <strong>Figure 4.</strong> PCA plots of the embeddings from the DINOv2-small encoder (blue) and
+                        our aligned multimodal
+                        encoder (yellow) at the first epoch (left) and last epoch (right) of training, for both
+                        types of adapters: (A) linear and (B) MLP adapters. The multimodal representations become
+                        progressively more aligned with the DINOv2 embeddings
+                        during training.
                     </figcaption>
                 </figure>
 
@@ -656,13 +652,17 @@
                     aligned with the DINOv2 embeddings than either the image or text representations alone.
                 </p>
 
-                <figure>
-                    <img src="figures/key_hypothesis_results.svg" alt="Key Hypothesis Results"
-                        style="width: 150%; height: auto;">
+                <figure style="width: 100%; max-width: 1200px; margin: 0 auto;">
+                    <img src="figures/key_hypothesis_results.jpg" alt="Key Hypothesis Results"
+                        style="width: 100%; height: auto;">
                     <figcaption>
-                        <strong>Figure 5.</strong> The mutual-KNN kernel alignment metric for the aligned multimodal
-                        kernel surpasses both the average and the best of the unimodal kernels, supporting both the weak
-                        and strong hypotheses for both adapter types.
+                        <strong>Figure 5.</strong> The mutual-KNN kernel alignment metric for our aligned multimodal
+                        encoder surpasses both the (left) average of and the better of the two unimodal encoder,
+                        supporting both the weak
+                        and strong hypotheses, for both (A) linear adapters and (B) MLP adapters. This means that the
+                        mutimodal Representations
+                        learned by aligning image and text representations are more similar to the DINOv2 embeddings
+                        than either modality alone.
                     </figcaption>
                 </figure>
 
