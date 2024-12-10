@@ -481,22 +481,25 @@
                         <li><strong>MLP Adapter:</strong> A two-layer MLP with GELU activation and LayerNorm:
                             \[
                             \operatorname{MLP}(z) = \operatorname{LayerNorm}(\operatorname{GELU}(W_2
-                            \operatorname{GELU}(W_1 z)))
+                            \operatorname{GELU}(W_1 z))), \quad z \in \mathcal{X} \text{ or } z \in \mathcal{Y}
                             \]
                         </li>
                     </ul>
                 </li>
             </ul>
+            <p>
+                After training, the adapted image encoder, text encoder, and the aligned multimodal encoder can be used
+                to extract features for downstream tasks, such as image classification.
+            </p>
+
             <figure>
                 <img src="figures/img_txt_concept.svg" alt="Multimodal Alignment Architecture">
                 <figcaption><strong>Figure.</strong> Conceptual illustration of our approach to using frozen
-                    pretrained
-                    encoders to map single modalities (image and text) into shared latent space.
-                    We encode image and text pairs using pretrained ResNet-18 and DistilBERT encoders. We use learnable
-                    adapters
-                    to map from the dimensions of the embeddings of these frozen encoders to a the dimension of the
-                    shared multimodal latent space which is set to be equal to the emdedding dimension of a performant
-                    model.
+                    pretrained encoders to map single modalities (image and text) into shared latent space.
+                    We encode image and text pairs using frozen pretrained ResNet-18 and DistilBERT encoders. We use
+                    learnable adapters to map from the dimensions of the embeddings of these frozen encoders to a the
+                    dimension of the shared multimodal latent space which is set to be equal to the emdedding dimension
+                    of a performant model.
                 </figcaption>
             </figure>
 
@@ -559,8 +562,18 @@
                     <li><strong>Multimodal Kernel Alignment:</strong> \( m(K_{\text{align}}, K_{\text{DINOv2}}) \).</li>
                     <li><strong>Test Key Hypothesis:</strong> We test our "Key Hypotheses" state in the mathemtical
                         framework (see figure "Hypothesis Test Diagram").</li>
-                    <li><strong>Downstream Task:</strong> Classification on CIFAR-10 using aligned embeddings as feature
-                        inputs (see figure "Downstream Evaluation Diagram").</li>
+                    <li><strong>Downstream Task:</strong> We use the embeddings from the adapted encoders and the
+                        aligned
+                        multimodal encoder as feature inputs for a CIFAR-10 classification task. We compare the
+                        classification
+                        accuracy of:
+                        <ul>
+                            <li>DinoV2-small embeddings (baseline).</li>
+                            <li>Aligned multimodal embeddings.</li>
+                            <li>Image-only embeddings.</li>
+                        </ul>
+                    </li>
+
                 </ul>
             </ul>
 
@@ -597,9 +610,12 @@
                 Specifically, we compute the following three metrics:
             </p>
             <ul>
-                <li>\( m(K_Y, K_{\text{DINOv2}}) \): Alignment of the text encoder kernel to the DINOv2 kernel.</li>
-                <li>\( m(K_X, K_{\text{DINOv2}}) \): Alignment of the image encoder kernel to the DINOv2 kernel.</li>
-                <li>\( m(K_{\text{align}}, K_{\text{DINOv2}}) \): Alignment of the multimodal kernel to the DINOv2
+                <li>\( m(K_X, K_{\text{DINOv2}}) \): Alignment of the image encoder \( f_\text{image} \)kernel to the
+                    DINOv2 kernel.</li>
+                <li>\( m(K_Y, K_{\text{DINOv2}}) \): Alignment of the text encoder \( g_\text{text} \) kernel to the
+                    DINOv2 kernel.</li>
+                <li>\( m(K_{\text{align}}, K_{\text{DINOv2}}) \): Alignment of the multimodal encoder \( h_\text{mult}
+                    \) kernel to the DINOv2
                     kernel.</li>
             </ul>
 
@@ -613,7 +629,7 @@
             <figure>
                 <img src="figures/kernel_metric_barplot.svg" alt="Kernel Metric Bar Plot">
                 <figcaption>
-                    <strong>Figure 1.</strong> Bar plot showing the mutual-KNN kernel alignment metric before and after
+                    <strong>Figure.</strong> Bar plot showing the mutual-KNN kernel alignment metric before and after
                     training for the linear (left) and MLP (right) adapters. For both adapter types and
                     all encoders, kernel alignment to the DINOv2-small model improves after training with the
                     dual encoder contrastive objective.
@@ -630,7 +646,7 @@
             <figure>
                 <img src="figures/pca_alignment.svg" alt="PCA Alignment Visualization">
                 <figcaption>
-                    <strong>Figure 2.</strong> PCA plots of the DINOv2 embeddings (blue) and aligned multimodal
+                    <strong>Figure.</strong> PCA plots of the DINOv2 embeddings (blue) and aligned multimodal
                     representations (yellow)
                     at the first epoch (left) and last epoch (right) of training. The multimodal representations become
                     progressively more aligned with the DINOv2 embeddings during training.
@@ -669,7 +685,7 @@
             <figure>
                 <img src="figures/key_hypothesis_results.svg" alt="Key Hypothesis Results">
                 <figcaption>
-                    <strong>Figure 3.</strong> The mutual-KNN kernel alignment metric for the aligned multimodal kernel
+                    <strong>Figure.</strong> The mutual-KNN kernel alignment metric for the aligned multimodal kernel
                     surpasses both the average and the best of the unimodal kernels, supporting both the weak and
                     strong hypotheses for both adapter types.
                 </figcaption>
@@ -694,8 +710,8 @@
             </p>
 
             <p>
-                After training the adapters, we freeze the adapted encoders (image-only \( f_\text{image}\), and
-                multimodal) and use them
+                After training the adapters, we freeze the adapted encoders (image \( f_\text{image}\), and
+                multimodal ( h_\text{multi}\)) and use them
                 to
                 extract features for the CIFAR-10 images. A simple classifier head is then trained on these features to
                 measure accuracy. We perform this experiment with both linear and MLP adapters and compare the
@@ -765,6 +781,8 @@
             <!-- TOOD: Add to discussion: Anout the complexity of adapters impact on alignent. We observed that linear
             adapters slightly outperform MLP adapters in downstream tasks, possibly because simpler transformations
             preserve global structure better. -->
+            <!-- TODO: Need to update discussion in light of the results that show that both the weak and strong hypotheses
+            are supported. Discuss ptential significance, if any of the strong hypothesis. -->
             <h2>Discussion</h2>
             <p>
                 In this project, we build upon a central premise of the Platonic Representation Hypothesis (PRH)
@@ -810,8 +828,6 @@
                 incorporated without retraining the entire model.
             </p>
 
-            <!-- TODO: Need to update discussion in light of the results that show that both the weak and strong hypotheses
-            are supported. -->
             <h3>Empirical Insights</h3>
             <p>
                 Our results provide partial validation of our hypotheses. Specifically, we observed that the
@@ -850,17 +866,24 @@
             <h2>Future Directions</h2>
             <ul>
                 <li>
-                    Scale experiments to richer multimodal datasets and benchmarks.
+                    Scale experiments to richer multimodal datasets and benchmarks. Specifically,
+                    expanding beyond images and text, we will integrate audio as a third modality.
+                    We would Test whether incorporating a third modality firther improvef the kernel alignment metrics
+                    beyond what we saw wih two modalities.
                     <p>
-                        Talk specifically about how we plan to use the VGGSound to try this
-                        using three modalites. What does the loss look like with three modalites, one may ask?
-                        We need a generalization from dual-encoder contrastive loss to any number of modalities.
-                        That answer be as simple as generalizing the dot/inner product in the loss (the logits in the
-                        exponent)
-                        to the <a
-                            href="https://math.stackexchange.com/questions/1137102/dot-product-for-3-vectors">Hadamard
-                            product</a>
-                        of the embeddings of the modalities.
+                        Same approach as this project but now the dataset would the VGGSound dataset andwe could use
+                        something like Wav2Vec as our pre-trained frozen audio encoder.
+                        Potential limitaiton is VGGsound doesn't seem straightforward to download this dataset. Each
+                        line in the csv file has columns defined by:
+                        # YouTube ID, start seconds, label, train/test split.
+                    <p>
+                    </p>What does the loss look like with three modalites, one may ask?
+                    We need a generalization from dual-encoder contrastive loss to any number of modalities.
+                    That answer be as simple as generalizing the dot/inner product in the loss (the logits in the
+                    exponent)
+                    to the <a href="https://math.stackexchange.com/questions/1137102/dot-product-for-3-vectors">Hadamard
+                        product</a>
+                    of the embeddings of the modalities.
                     </p>
                 </li>
                 <li>Investigate cross-architecture generalization of aligned embeddings.</li>
