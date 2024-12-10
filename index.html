@@ -489,14 +489,14 @@
                 </li>
                 <li><strong>Data Loading:</strong>
                     <ul>
-                        <li>Batch size: 128.</li>
+                        <li>Batch size: 256.</li>
                         <li>Train-validation split: 75%-25%.</li>
                     </ul>
                 </li>
             </ul>
             <details>
                 <summary><em>Expand for schematic of data pipeline.</em></summary>
-                <img src="figures/data_pipeline.jpg" alt="Data Pipeline">
+                <img src="figures/data_pipeline.svg" alt="Data Pipeline">
             </details>
 
             <h3>Model Architecture</h3>
@@ -525,21 +525,23 @@
             <p>
                 We train the adapters to align image and text representations using the dual-encoder
                 contrastive loss.
-                Both <strong>linear </strong> and <strong>2-layer MLP</strong> adapters are trained for <strong>15
+                Both <strong>linear </strong> and <strong>2-layer MLP</strong> adapters are trained for <strong>100
                     epochs</strong> on the <strong>Flickr30k</strong> dataset
-                using a temperature scaling value of \( \tau = 0.07 \) in the contrastive loss. Other releavnt
+                using a temperature scaling value of \( \tau = 0.02 \) in the contrastive loss. Other releavnt
                 hyperparameter settings are:
             </p>
 
             <ul>
                 <li><strong>Optimizer:</strong> AdamW</li>
-                <li><strong>Learning Rate:</strong> \(5 \times 10^{-5}\) (cosine decay with warmup).</li>
-                <li><strong>Gradient Clipping:</strong> 1.0.</li>
-                <li><strong>Weight Decay:</strong> 0.01.</li>
+                <li><strong>Learning Rate:</strong> \(1 \times 10^{-4}\) (cosine decay with warmup).</li>
+                <li><strong>Gradient Clipping:</strong> 0.5.</li>
+                <li><strong>Weight Decay:</strong> 0.001 (linear adapter) and 0.005 (MLP adapter).</li>
+                <li><strong>Label Smoothing:</strong> 0.05.</li>
+                <li><strong>Dropout:</strong> 0.1.</li>
             </ul>
             <details>
                 <summary><em>Expand for schematic of training pipeline.</em></summary>
-                <img src="figures/training_pipeline.jpg" alt="Training Pipeline">
+                <img src="figures/training_pipeline.svg" alt="Training Pipeline">
             </details>
 
             <h3>Evaluation Metrics</h3>
@@ -592,7 +594,7 @@
             </ul>
             <details>
                 <summary><em>Expand for schematic of hypothesis testing.</em></summary>
-                <img src="figures/hypothesis_test.jpg" alt="Hypothesis Testing">
+                <img src="figures/hypothesis_test.svg" alt="Hypothesis Testing">
             </details>
         </section>
 
@@ -608,7 +610,7 @@
                 </p>
 
                 <figure style="width: 100%; max-width: 1200px; margin: 0 auto;">
-                    <img src="figures/kernel_metric_barplot.jpg" alt="Kernel Metric Bar Plot"
+                    <img src="figures/kernel_metric_barplot.png" alt="Kernel Metric Bar Plot"
                         style="width: 100%; height: auto;">
                     <figcaption>
                         <strong>Figure 3.</strong> Bar plot showing the mutual-KNN kernel alignment metric before and
@@ -632,7 +634,9 @@
                 </p>
 
                 <figure style="width: 100%; max-width: 1200px; margin: 0 auto;">
-                    <img src="figures/pca_alignment.svg" alt="PCA Alignment Visualization"
+                    <img src="figures/linear_adapter.gif" alt="PCA Alignment Visualization"
+                        style="width: 100%; height: auto;">
+                    <img src="figures/mlp_adapter.gif" alt="PCA Alignment Visualization"
                         style="width: 100%; height: auto;">
                     <figcaption>
                         <strong>Figure 4.</strong> PCA plots of the embeddings from the DINOv2-small encoder (blue) and
@@ -653,7 +657,7 @@
                 </p>
 
                 <figure style="width: 100%; max-width: 1200px; margin: 0 auto;">
-                    <img src="figures/key_hypothesis_results.jpg" alt="Key Hypothesis Results"
+                    <img src="figures/key_hypothesis_results.png" alt="Key Hypothesis Results"
                         style="width: 100%; height: auto;">
                     <figcaption>
                         <strong>Figure 5.</strong> The mutual-KNN kernel alignment metric for our aligned multimodal
