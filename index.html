@@ -7,7 +7,6 @@
     <script type="text/javascript" async
         src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
     <title>Aligning Modalities: Efficient Multimodal Representation Learning</title>
-    <link rel="stylesheet" href="styles/style.css">
 </head>
 
 <body>
@@ -657,14 +656,6 @@
                     aligned with the DINOv2 embeddings than either the image or text representations alone.
                 </p>
 
-                <p>
-                    Importantly, our multimodal encoder was not trained to match DINOv2-small outputs. Our contrastive
-                    objective did not involve DINOv2 during training. Therefore, the fact that the aligned multimodal
-                    representations are more similar to DINOv2 than the image encoder alone suggests that the alignment
-                    is not a trivial consequence of the image encoder's similarity to DINOv2. This reinforces the value
-                    of multimodal alignment and supports the Platonic Representation Hypothesis.
-                </p>
-
                 <figure>
                     <img src="figures/key_hypothesis_results.svg" alt="Key Hypothesis Results"
                         style="width: 150%; height: auto;">
@@ -860,47 +851,119 @@
     </main>
 
     <footer>
-        <p> Quilee Simeon & Gabe Manso | MIT Deep Learning Final Project Blog | December 2024</p>
+        <p>Quilee Simeon & Gabe Manso | MIT Deep Learning Final Project Blog | December 2024</p>
     </footer>
+
+    <style>
+        /* General Styling */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+
+        /* Header Styling */
+        header {
+            background: #005f73;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        /* Section Styling */
+        main {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        section {
+            margin-bottom: 20px;
+        }
+
+        section h2 {
+            border-bottom: 2px solid #005f73;
+            padding-bottom: 5px;
+            color: #005f73;
+            font-size: 1.5em;
+        }
+
+        /* List Styling */
+        ul {
+            padding-left: 20px;
+            list-style-type: disc;
+        }
+
+        ul li {
+            margin-bottom: 10px;
+        }
+
+        /* Footer Styling */
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            background: #005f73;
+            color: white;
+            font-size: 0.9em;
+        }
+
+        /* Code and Pre-formatted Text */
+        code,
+        pre {
+            background: #e0f4f4;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.95em;
+        }
+
+        /* Image and Visualization Placeholder Styling */
+        img {
+            max-width: 100%;
+            height: auto;
+            margin: 10px 0;
+        }
+
+        p em {
+            font-style: italic;
+            color: #666;
+        }
+
+        figure {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .figures-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        figure img {
+            width: 400px;
+            height: auto;
+        }
+
+        figcaption {
+            text-align: center;
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
 </body>
-
-
-<style>
-    figure {
-        display: flex;
-        /* Arrange images side by side */
-        flex-direction: column;
-        /* Ensure caption appears below images */
-        align-items: center;
-        /* Center the content */
-        gap: 10px;
-        /* Add space between images and caption */
-    }
-
-    .figures-container {
-        display: flex;
-        /* Arrange figures side by side */
-        justify-content: center;
-        /* Center the figures on the page */
-        gap: 20px;
-        /* Add spacing between the figures */
-    }
-
-    figure img {
-        width: 400px;
-        /* Adjust image width */
-        height: auto;
-        /* Maintain aspect ratio */
-    }
-
-    figcaption {
-        text-align: center;
-        /* Center-align the caption text */
-        font-size: 14px;
-        /* Adjust caption font size */
-        color: #555;
-        /* Add a softer color for the caption */
-    }
-</style>
 
 </html>
