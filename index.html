@@ -31,25 +31,29 @@
                 This project bridges these ideas by exploring whether representations from disparate pre-trained
                 unimodal neural networks can be aligned into a shared multimodal latent space, inspired by the joint
                 embedding approach of CLIP and motivated by the convergence hypothesis of Platonic Representations. The
-                proposed framework uses frozen unimodal encoders (e.g., ResNet-18 for images, GPT-2 for text) with
+                proposed framework uses frozen unimodal encoders (e.g., ResNet-18 for images, DistilBERT for text)
+                with
                 learned linear adapters to align representations across modalities. Our aim is to determine if such
-                aligned representations better approximate those of larger, more performant models (e.g., DINOv2-small).
+                aligned representations better approximate those of larger, more performant models (e.g., DINOv2).
             </p>
             <p>
                 Inspired by the success of CLIP in aligning representations across modalities and the theoretical
                 insights of the Platonic Representation Hypothesis, we propose a framework that aligns pre-trained
                 unimodal encoders into a shared multimodal latent space using simple linear adapters. By leveraging
-                frozen encoders such as ResNet-18 for images and GPT-2 for text, we aim to achieve alignment without
-                retraining these large models, enabling scalability to new modalities with minimal overhead.
+                frozen encoders such as ResNet-18 for images and DistilBERT for text, we aim to achieve alignment
+                without retraining a larger state-of-the-art model like DINOv2, enabling scalability to new modalities
+                with minimal overhead.
             </p>
             <figure>
                 <img src="figures/conceptual_contrastive.svg" alt="Conceptual Multimodal Alignment"
                     style="width: 100%; height: auto;">
                 <figcaption>
                     <strong>Figure 1.</strong> Conceptual illustration of our multimodal alignment framework. Image
-                    representations (from ResNet-18) and text representations (from GPT-2) are aligned into a shared
-                    latent space using adapters. Matching pairs are pulled together, while non-matching pairs are pushed
-                    apart, approximating a unified embedding inspired by the Platonic Representation Hypothesis.
+                    representations (from ResNet-18) and text representations (from DistilBERT) for images and
+                    corresponding first captions sampled from the Flickr30k dataset are aligned into a
+                    shared latent space using lightweight adapters. Matching image-caption pairs are pulled together,
+                    while non-matching pairs are pushed apart, approximating a unified embedding inspired by the
+                    Platonic Representation Hypothesis.
                 </figcaption>
             </figure>
 
@@ -100,22 +104,23 @@
                     framework aims to circumvent.
                 </li>
                 <li>
-                    <strong><a href="https://arxiv.org/abs/2209.15162">Linear Mapping from Image to Text
-                            Space</a>:</strong> Merullo et al. (2022) showed that simple
-                    linear transformations can align visual representations to text spaces, enabling cross-modal tasks
+                    <strong>Linear Mapping from Image to Text Space:</strong> <a
+                        href="https://arxiv.org/abs/2209.15162">Merullo et al. (2022)</a> showed that
+                    simple linear transformations can align visual representations to text spaces, enabling cross-modal
+                    tasks
                     like visual question answering. Their findings inspired our use of linear and lightweight MLP
                     adapters for multimodal alignment.
                 </li>
                 <li>
-                    <strong><a href="https://arxiv.org/abs/2304.07193">DINOv2</a>:</strong> Oquab et al. (2023)
+                    <strong>DINOv2:</strong> <a href="https://arxiv.org/abs/2304.07193">Oquab et al. (2023)</a>
                     introduced DINOv2, a self-supervised vision transformer
                     model that generates robust embeddings. As our performant reference model, DINOv2-small provides a
                     benchmark
                     for evaluating the quality of our aligned multimodal representations.
                 </li>
                 <li>
-                    <strong><a href="https://arxiv.org/abs/2005.10242"></a>Contrastive Representation
-                        Learning</strong>a>:</strong> Wang and Isola (2020) provided theoretical
+                    <strong>Contrastive Representation Learning:</strong>
+                    <a href="https://arxiv.org/abs/2005.10242">Wang and Isola (2020)</a> provided theoretical
                     insights into
                     contrastive learning by analyzing alignment and uniformity on the hypersphere. Their work shows that
                     contrastive
@@ -180,10 +185,11 @@
                 <img src="figures/platonic_representation.svg" alt="Platonic Representation Hypothesis"
                     style="width: 80%; height: auto;">
                 <figcaption>
-                    <strong>Figure 2.</strong> Illustration of the Platonic Representation Hypothesis (PRH).
+                    <strong>Figure 2.</strong> Conceptual illustration of the connection between the Platonic
+                    Representation Hypothesis (PRH) and our project framework, adapted from Figure 1 of PRH blog.
                     Representations from different modalities (e.g., images, text) are hypothesized to converge toward a
                     shared statistical model — the Platonic representation. Our framework uses contrastive learning to
-                    align these representations into a shared latent space, approximating this convergence.
+                    explicitly align these representations into a shared latent space, approximating this convergence.
                 </figcaption>
             </figure>
 
@@ -200,6 +206,14 @@
             </p>
             <p>
                 where \( d_x \) and \( d_y \) are the embedding dimensions for images and text, respectively.
+            </p>
+            <p>
+                We use a pretrained <a href="https://huggingface.co/microsoft/resnet-18">ResNet-18
+                    model pretrained</a> on <a href="https://www.image-net.org/download.php">ImageNet1K</a> as our
+                frozen pretrained imaged encoder and a <a
+                    href="https://huggingface.co/distilbert/distilbert-base-uncased">DistilBERT model pretrained</a> on
+                <a href="https://yknzhu.wixsite.com/mbweb">BookCorpus</a> as our frozen text encoder.
+
             </p>
             <p>
                 To project these representations into a shared latent space \( \mathbb{R}^{d_e} \), we introduce learned
@@ -231,16 +245,18 @@
 
             <h3>Dual-Encoder Contrastive Objective</h3>
             <p>
-                To align the representations, we use a <strong>dual-encoder contrastive loss</strong>, inspired by the
-                formulation in the <a href="https://phillipi.github.io/prh/">PRH</a> and Homework 4:
+                To align the representations, we use a <strong>dual-encoder contrastive loss</strong>.
+            <details>
+                <summary>Homework 4</summary>
+                <figure>
+                    <img src="figures/homework4_contrastive.jpg" alt="" style="width: 80%; height: auto;">
+                </figure>
+            </details>
             </p>
-            <figure>
-                <img src="figures/homework4_contrastive.jpg" alt="Dual-Encoder Contrastive Loss"
-                    style="width: 80%; height: auto;">
-            </figure>
+
 
             <p>
-                The loss encourages
+                Our loss encourages is designed to encourage
                 representations from matching pairs to be similar while pushing apart representations from non-matching
                 pairs:
             </p>
@@ -255,9 +271,17 @@
             <p>
                 where \( \tau \) is the temperature parameter that scales the similarity scores.
             </p>
+            <p>
+                Our use of the dual-encoder contrastive objective is a unique extension of traditional contrastive
+                learning. Typically, contrastive learning applies to different "views" generated through transformations
+                or augmentations of samples from a <em>single modality</em>. In our approach, we generalize this concept
+                by treating <em>different modalities</em> (image and text, in this case) as distinct views of a
+                <strong>hypothesized common underlying reality</strong>, inspired by the Platonic Representation
+                Hypothesis.
+            </p>
 
 
-            <h3>Interpretation and Connection to PRH</h3>
+            <h3>Connection to PRH</h3>
             <p>
                 The <strong>Platonic Representation Hypothesis (PRH)</strong> posits that representations from different
                 modalities converge toward a shared Platonic representation. In our framework, we hypothesize that
@@ -284,32 +308,53 @@
 
             <p>
                 Given this, we define our <strong>aligned multimodal encoder</strong> \( h_\text{multi} \) as a function
-                that averages the embeddings ooutput by the adapted image and text encoders, i.e.:
+                that "averages" (i.e takes a convex combination of) the embeddings output by the adapted image and text
+                encoders, i.e.:
             </p>
-            \[
-            h_\text{multi}: \mathcal{X} \times \mathcal{Y} \rightarrow \mathbb{R}^{d_e}, \quad h_\text{multi}(x, y) =
-            \frac{1}{2}
-            \left(f_{\text{image}}(x) + g_{\text{text}}(y)\right).
-            \]
+            <p>
+                \[
+                h_\text{multi}: \mathcal{X} \times \mathcal{Y} \rightarrow \mathbb{R}^{d_e}, \quad h_\text{multi}(x, y)
+                =
+                \lambda \cdot f_{\text{image}}(x) + (1 - \lambda) \cdot g_{\text{text}}(y)
+                \]
             </p>
 
+            <p>
+                where \( \lambda \in [0, 1] \) is a learnable hyperparameter that controls the balance between the image
+                and text
+                embeddings.
+
+            </p>
             <p>
                 We call the output \( h_\text{multi}(x^{(i)}, y^{(i)}) \) the <strong>aligned multimodal
                     representation</strong>
                 and claim that this is an <strong>approximation</strong> of the Platonic representation of the \(i\)-th
                 data point. While the true
                 Platonic representation is unknown, we follow the PRH
-                conjecture that performant models, such as the DINOv2 models by <a
-                    href="https://arxiv.org/abs/2304.07193">Oquab et al. (2023)</a>, produce representations that are
-                converging toward
-                it. We will use the features extracted by a pretrained <a
-                    href="https://huggingface.co/facebook/dinov2-small">DINOv2-small</a> backbone as a
+                conjecture that performant models (such as <a
+                    href="https://github.com/facebookresearch/dinov2">DINOv2</a>)
+                produce representations that are converging toward it. We use the features extracted by a
+                pretrained <a href="https://huggingface.co/facebook/dinov2-small">DINOv2-small</a> backbone as a
                 <strong>proxy</strong> for the Platonic representation.
             </p>
 
+            <h3>Performant Model Benchmark</h3>
             <p>
-                We evaluate the quality of our aligned multimodal encoder \( h_\text{multi} \) its representations to
-                those of the DINOv2-small feature extractor using a <strong>kernel alignment metric</strong>.
+                We will refer to the function implemented by the DINOv2-small feature extractor as the
+                DINOv2-small encoder:
+            </p>
+            <p>
+                \[
+                \text{DINOv2}: \mathcal{X} \rightarrow \mathbb{R}^{d_e}.
+                \]
+            </p>
+
+            <p>
+                This emphasizes its role as another image encoder that serves as a reference or benchmark for evaluating
+                our aligned
+                representations. We evaluate the quality of our aligned multimodal encoder \( h_\text{multi} \) its
+                representations to
+                those of the DINOv2-small encoder using a <strong>kernel alignment metric</strong>.
             </p>
 
             <h3>Kernel Alignment Metric</h3>
@@ -358,10 +403,6 @@
                         \[
                         K_\text{DINOv2}(i, j) = \langle \text{DINOv2}(x^{(i)}), \text{DINOv2}(x^{(j)}) \rangle
                         \]
-                    </p>
-                    <p>
-                        We emphasize that DINOv2-small is an <strong>image-only</strong> model so its kernel is computed
-                        using samples from the image modality as input.
                     </p>
                 </li>
             </ul>
@@ -421,239 +462,124 @@
             <h2>Methodology</h2>
 
             <p>
-                All code we used for this project is implemented in this <a
-                    href="https://colab.research.google.com/drive/1BkyPko0x-8CL41Z-VSmyxI41B90hB2Fc?usp=sharing">Google
+                All code for this project is available in our
+                <a href="https://colab.research.google.com/drive/1BkyPko0x-8CL41Z-VSmyxI41B90hB2Fc?usp=sharing">Google
                     Colab notebook</a>.
             </p>
 
             <h3>Data Pipeline</h3>
             <p>
-                We construct our world dataset \( \mathcal{D}_\text{world} \) from first 12,800 samples from
-                <strong>Flickr30k</strong>
-                dataset, which contains paired image-caption samples. Each image \( x^{(i)} \) in Flickr30k dataset is
-                associated with
-                5 captions, but for our dataset we used only the first caption \( y^{(i)} \) as a single postive
-                anchor The data
-                pipeline processes these pairs to generate tensors compatible with our models. Key stages of the
-                pipeline include:
+                We construct our world dataset \( \mathcal{D}_\text{world} \) from the first 12,800 samples of the
+                <strong><a href="https://huggingface.co/datasets/nlphuji/flickr30k">Flickr30k</a></strong> dataset,
+                which contains paired image-caption samples. Each image in Flickr30k dataset is
+                associated with 5 captions, but we use only the first caption so that we have a single postive pair per
+                data point \( x^{(i)}, y^{(i)} \)
+                corresponding to our <a href="#mathematical-framework">Mathematical Framework</a>.
             </p>
             <ul>
                 <li><strong>Image Processing:</strong>
                     <ul>
-                        <li>Resize images to \(224 \times 224\) pixels.</li>
+                        <li>Resize to 224x224.</li>
                         <li>Normalize using ImageNet statistics.</li>
-                        <li>Convert to tensors suitable for ResNet-18.</li>
+                        <li>Convert to tensors for ResNet-18.</li>
                     </ul>
                 </li>
                 <li><strong>Text Processing:</strong>
                     <ul>
-
-                        <li>Tokenize captions using the DistilBERT tokenizer.</li>
-                        <li>Pad or truncate tokens to a maximum length of 64.</li>
-                        <li>Convert tokens to tensors suitable for DistilBERT.</li>
+                        <li>Tokenize with DistilBERT tokenizer.</li>
+                        <li>Pad/truncate to 64 tokens.</li>
+                        <li>Convert to tensors for DistilBERT.</li>
                     </ul>
                 </li>
                 <li><strong>Data Loading:</strong>
                     <ul>
-                        <li>Batch size: 256</li>
-                        <li>75%-25% train-test split.</li>
-                        <li>Optimized for GPU utilization with shuffling and memory pinning.</li>
+                        <li>Batch size: 128.</li>
+                        <li>Train-validation split: 75%-25%.</li>
                     </ul>
                 </li>
             </ul>
-            <figure>
-                <img src="figures/data_pipeline.jpg" alt="Data Pipeline for Multimodal Preprocessing">
-                <figcaption><strong>Figure 3.</strong> This schematic illustrates the data pipeline used to preprocess
-                    paired images and captions from the Flickr30k dataset. On the left, raw images are resized to
-                    224x224, converted to tensors, and normalized using ImageNet statistics to create image batches
-                    suitable for the ResNet-18 encoder. On the right, raw captions are tokenized using the DistilBERT
-                    tokenizer, padded, and converted to tensors for the DistilBERT encoder. Both image and text batches
-                    are loaded into the DataLoader with a batch size of 128, split into 75% for training and 25% for
-                    validation, optimizing GPU utilization for efficient processing.
-
-                </figcaption>
-            </figure>
+            <details>
+                <summary><em>Expand for schematic of data pipeline.</em>.</summary>
+                <img src="figures/data_pipeline.jpg" alt="Data Pipeline">
+            </details>
 
             <h3>Model Architecture</h3>
             <p>
-                The architecture consists of frozen pre-trained encoders and trainable adapters that align
-                representations in a shared multimodal space.
+                The architecture uses frozen pre-trained encoders and trainable adapters for aligning representations in
+                a shared multimodal space.
             </p>
             <ul>
-                <li><strong>Frozen Image Encoder:</strong> ResNet-18 (input type: RGB image; output dimension: 512).
-                </li>
-                <li><strong>Frozen Text Encoder:</strong> DistilBERT (input type: text string; output dimension: 768).
-                </li>
-                <li><strong>Performant Model Backbone:</strong> DINOv2-small (input type: RGB image; output
-                    dimension: 768).</li>
-                <li><strong>Adapters:</strong>
+                <li><strong>Frozen Encoders:</strong>
                     <ul>
-                        <li><strong>Linear Adapter:</strong> Projects frozen encoder outputs to a shared dimension of
-                            768,
-                            which is embedding dimension of DINOv2-small's features:
-                            \[
-                            W_x : \mathbb{R}^{512} \to \mathbb{R}^{768}, \quad W_y : \mathbb{R}^{768} \to
-                            \mathbb{R}^{768}
-                            \]
-                        </li>
-                        <li><strong>MLP Adapter:</strong> A two-layer MLP with GELU activation and LayerNorm:
-                            \[
-                            \operatorname{MLP}(z) = \operatorname{LayerNorm}(\operatorname{GELU}(W_2
-                            \operatorname{GELU}(W_1 z))), \quad z \in \mathcal{X} \text{ or } z \in \mathcal{Y}
-                            \]
-                        </li>
+                        <li>Image: ResNet-18 (output dimension: \( d_x = 512\)).</li>
+                        <li>Text: DistilBERT (output dimension: \( d_y = 768\)).</li>
                     </ul>
                 </li>
+                <li><strong>Adapters \( \left( W_x, W_y \right) \):</strong>
+                    <ul>
+                        <li>Linear Adapter: Matrix multiplication plus bias term.</li>
+                        <li>MLP Adapter: Two-layer MLP with GELU and LayerNorm.</li>
+                        <li>Output dimension: \( d_e = 768 \).</li>
+                    </ul>
+                </li>
+                <li><strong>Reference Model:</strong> DINOv2-small (output dimension: \( d_e = 768 \)).</li>
             </ul>
-            <p>
-                After training, the aligned multimodal encoder may be used to extract features for downstream tasks,
-                such as image classification or visual question answering.
-            </p>
 
             <h3>Training Procedure</h3>
             <p>
-                We train the adapters for <strong>15 epochs</strong> using a dual-encoder contrastive loss with
-                temperature
-                scaling (\(\tau = 0.07\)).
+                We train the adapters to align image and text representations using the dual-encoder
+                contrastive loss outlined in the <a href="#mathematical-framework">Mathematical Framework</a>.
+                Both <strong>linear </strong> and <strong>2-layer MLP</strong> adapters are trained for <strong>15
+                    epochs</strong> on the <strong>Flickr30k</strong> dataset
+                using a temperature scaling value of \( \tau = 0.07 \) in the contrastive loss. Other releavnt
+                hyperparameter settings are:
             </p>
 
-            <p>
-                \[
-                \mathcal{L} = -\frac{1}{N} \sum_{i=1}^N \log \frac{\exp\left(f_\text{image}(x^{(i)}) \cdot
-                g_\text{text}(y^{(i)}) / \tau\right)}{\sum_{j=1}^N \exp\left(f_\text{image}(x^{(i)}) \cdot
-                g_\text{text}(y^{(j)}) / \tau\right)}.
-                \]
-            </p>
-            <p>The training loop consists of:</p>
-            <ol>
-                <li>Forward pass through frozen encoders and adapters.</li>
-                <li>Compute contrastive loss for matching and non-matching pairs.</li>
-                <li>Update adapter weights using the AdamW optimizer with:
-                    <ul>
-                        <li>Learning rate: \(5 \times 10^{-5}\) (cosine decay with warmup).</li>
-                        <li>Gradient clipping (norm: 1.0).</li>
-                        <li>Weight decay: 0.01.</li>
-                    </ul>
-                </li>
-            </ol>
-
-
-            <figure>
-                <img src="figures/training_pipeline.jpg" alt="Training Pipeline with Dual-Encoder Contrastive Loss">
-                <figcaption><strong>Figure 4.</strong> A schematic of the complete training pipeline for aligning image
-                    and text representations. Images and captions are processed through the respective frozen ResNet-18
-                    and DistilBERT encoders. The resulting features are projected into a shared latent space using
-                    adapters. The representations are normalized and used to compute the similarity between matching and
-                    non-matching pairs. The dual-encoder contrastive loss encourages matching pairs to have higher
-                    similarity and non-matching pairs to be pushed apart. The loss combines contrastive learning with
-                    distribution matching, facilitating effective multimodal alignment.
-                </figcaption>
-            </figure>
-
+            <ul>
+                <li><strong>Optimizer:</strong> AdamW</li>
+                <li><strong>Learning Rate:</strong> \(5 \times 10^{-5}\) (cosine decay with warmup).</li>
+                <li><strong>Gradient Clipping:</strong> 1.0.</li>
+                <li><strong>Weight Decay:</strong> 0.01.</li>
+            </ul>
+            <details>
+                <summary><em>Expand for schematic of training pipeline.</em>.</summary>
+                <img src="figures/training_pipeline.jpg" alt="Training Pipeline">
+            </details>
 
             <h3>Evaluation Metrics</h3>
             <p>
-                We evaluate alignment using the <strong>mutual-KNN kernel alignment metric</strong> \(m\):
-            </p>
-            <ul>
-                <ul>
-                    <li><strong>Unimodal Kernel Alignment:</strong> \( m(K_X, K_{\text{DINOv2}}) \) and \( m(K_Y,
-                        K_{\text{DINOv2}}) \).</li>
-                    <li><strong>Multimodal Kernel Alignment:</strong> \( m(K_{\text{align}}, K_{\text{DINOv2}}) \).</li>
-                    <li><strong>Test Key Hypothesis:</strong> We test our "Key Hypotheses" state in the mathemtical
-                        framework (see figure "Hypothesis Test Diagram").</li>
-                    </li>
+                We evaluate the alignment performance for the two types of adapters:
 
-                </ul>
-            </ul>
-
-            <figure>
-                <img src="figures/hypothesis_test.jpg" alt="Hypothesis Testing via Kernel Alignment Metrics">
-                <figcaption><strong>Figure 5.</strong> This diagram outlines the hypothesis testing process using kernel
-                    alignment metrics. Features are extracted from images and text using the respective encoders and
-                    adapters, as well as from the DINOv2-small model as a performant reference. Kernels are computed for
-                    the image, text, and aligned multimodal representations. The alignment metrics test two hypotheses:
-                    whether the aligned multimodal kernel surpasses the average unimodal alignment (H1) and whether it
-                    surpasses the best unimodal alignment (H2). Improvement margins are computed to verify these
-                    hypotheses, providing evidence for the effectiveness of multimodal alignment.
-                </figcaption>
-            </figure>
-        </section>
-
-        <section id="results">
-            <h2>Results</h2>
-
-            <h3>Experiment: Contrastive Alignment Training</h3>
-            <p>
-                In this experiment, we train our adapters to align image and text representations using the dual-encoder
-                contrastive loss outlined in the <a href="#mathematical-framework">Mathematical Framework</a>.
-                We evaluate the alignment performance for two types of adapters:
-                <strong>linear adapters</strong> and <strong>2-layer MLP adapters</strong>.
-            </p>
-
-            <p>
-                We train each type of adapter for <strong>15 epochs</strong> on the <strong>Flickr30k</strong> dataset.
-                The alignment performance is measured using the <strong>mutual-KNN kernel alignment metric</strong>.
+                using the <strong>mutual-KNN kernel alignment metric</strong> \( m \).
                 Specifically, we compute the following three metrics:
             </p>
             <ul>
-                <li>\( m(K_X, K_{\text{DINOv2}}) \): Alignment of the image encoder \( f_\text{image} \)kernel to the
-                    DINOv2 kernel.</li>
-                <li>\( m(K_Y, K_{\text{DINOv2}}) \): Alignment of the text encoder \( g_\text{text} \) kernel to the
-                    DINOv2 kernel.</li>
-                <li>\( m(K_{\text{align}}, K_{\text{DINOv2}}) \): Alignment of the multimodal encoder \( h_\text{mult}
-                    \) kernel to the DINOv2
-                    kernel.</li>
+                <li><strong>Unimodal Alignment</strong>:</li>
+                <ol>
+                    <li value="1">\( m(K_X, K_{\text{DINOv2}}) \): Alignment of the image encoder \( f_\text{image} \)
+                        kernel to
+                        the
+                        DINOv2 kernel.</li>
+                    <li value="2">\( m(K_Y, K_{\text{DINOv2}}) \): Alignment of the text encoder \( g_\text{text} \)
+                        kernel to the
+                        DINOv2 kernel.</li>
+                </ol>
+
+                <li><strong>Multimodal Alignment</strong>:</li>
+                <ol>
+                    <li value="3">\( m(K_{\text{align}}, K_{\text{DINOv2}}) \): Alignment of the multimodal encoder \(
+                        h_\text{mult}
+                        \) kernel to the DINOv2 kernel.</li>
+                </ol>
             </ul>
 
-            <h4>Result 1: Kernel Alignment Improves with Training</h4>
-            <p>
-                The first key finding of this experiment is that the mutual-KNN kernel alignment metric improves
-                significantly after training for both the linear and MLP adapters. This demonstrates that our
-                contrastive alignment objective effectively aligns the image and text representations.
-            </p>
-
-            <figure>
-                <img src="figures/kernel_metric_barplot.svg" alt="Kernel Metric Bar Plot">
-                <figcaption>
-                    <strong>Figure.</strong> Bar plot showing the mutual-KNN kernel alignment metric before and after
-                    training for the linear (left) and MLP (right) adapters. For both adapter types and
-                    all encoders, kernel alignment to the DINOv2-small model improves after training with the
-                    dual encoder contrastive objective.
-                </figcaption>
-            </figure>
-
-            <p>
-                We use PCA to visualize the alignment process between the DINOv2-small embeddings and the aligned
-                multimodal
-                embeddings. First, we apply the DINOv2-small feature extractor to our test set and compute the principal
-                components (PCs) of the resulting \(3200 \times 784\) matrix of embeddings. During training, at each
-                epoch,
-                we project the aligned multimodal embeddings onto the same PCs and plot the first two principal
-                component
-                scores for both sets of embeddings. This 2D visualization shows how the multimodal representations
-                evolve
-                to become more aligned with the DINOv2 embeddings.
-            </p>
-
-            <figure>
-                <img src="figures/pca_alignment.svg" alt="PCA Alignment Visualization">
-                <figcaption>
-                    <strong>Figure.</strong> PCA plots of the DINOv2 embeddings (blue) and aligned multimodal
-                    representations (yellow)
-                    at the first epoch (left) and last epoch (right) of training. The multimodal representations become
-                    progressively more aligned with the DINOv2 embeddings during training.
-                </figcaption>
-            </figure>
-
-            <h4>Result 2: Key Hypotheses Supported</h4>
-            <p>
-                We also test the key hypotheses outlined in the <a href="#mathematical-framework">Mathematical
-                    Framework</a>:
+            <p>We use these metrics to test the two <strong>key hypotheses</strong> stated in our <a
+                    href="#mathematical-framework">Mathematical Framework</a>:
             </p>
             <ul>
                 <li>
-                    <strong>Weak Hypothesis:</strong> The aligned multimodal kernel achieves higher similarity with
+                    <strong>Weak Hypothesis:</strong> The aligned multimodal kernel achieves higher similarity
+                    with
                     the DINOv2 kernel than the average of the unimodal kernels:
                     \[
                     m(K_{\text{align}}, K_{\text{DINOv2}}) > \text{avg}(m(K_X, K_{\text{DINOv2}}), m(K_Y,
@@ -661,37 +587,103 @@
                     \]
                 </li>
                 <li>
-                    <strong>Strong Hypothesis:</strong> The aligned multimodal kernel surpasses even the best unimodal
+                    <strong>Strong Hypothesis:</strong> The aligned multimodal kernel surpasses even the best
+                    unimodal
                     kernel:
                     \[
-                    m(K_{\text{align}}, K_{\text{DINOv2}}) > \max(m(K_X, K_{\text{DINOv2}}), m(K_Y, K_{\text{DINOv2}})).
+                    m(K_{\text{align}}, K_{\text{DINOv2}}) > \max(m(K_X, K_{\text{DINOv2}}), m(K_Y,
+                    K_{\text{DINOv2}})).
                     \]
                 </li>
             </ul>
 
-            <p>
-                The results show that both the weak and strong hypotheses are supported. This indicates that the
-                multimodal representations, which incorporate both image and text information, are more closely aligned
-                with the DINOv2 embeddings than either the image or text representations alone.
-            </p>
+            <ul>
+                <li><strong>\(H_1\)</strong>: Aligned multimodal kernel exceeds average unimodal alignment.</li>
+                <li><strong>\(H_2\)</strong>: Aligned multimodal kernel exceeds the best unimodal alignment.</li>
+            </ul>
+            <details>
+                <summary><em>Expand for schematic of hypothesis testing.</em>.</summary>
+                <img src="figures/hypothesis_test.jpg" alt="Hypothesis Testing">
+            </details>
+        </section>
 
-            <figure>
-                <img src="figures/key_hypothesis_results.svg" alt="Key Hypothesis Results">
-                <figcaption>
-                    <strong>Figure.</strong> The mutual-KNN kernel alignment metric for the aligned multimodal kernel
-                    surpasses both the average and the best of the unimodal kernels, supporting both the weak and
-                    strong hypotheses for both adapter types.
-                </figcaption>
-            </figure>
 
-            <p>
-                This result is particularly compelling given that DINOv2 is a self-supervised vision model trained
-                <em>without any text supervision</em>. The fact that multimodal alignment with text leads to
-                representations
-                that are more similar to DINOv2, we believe, supports the <strong>Platonic Representation
-                    Hypothesis</strong> —
-                suggesting a shared statistical model of reality across modalities.
-            </p>
+        <section id="results">
+            <h2>Results</h2>
+
+            <h3>Kernel Alignment Improves with Training</h4>
+                <p>
+                    Our first key finding is that the mutual-KNN kernel alignment metric improves
+                    after training for both the linear and MLP adapters. This demonstrates that our
+                    contrastive alignment objective effectively aligns the image and text representations.
+                </p>
+
+                <figure>
+                    <img src="figures/kernel_metric_barplot.svg" alt="Kernel Metric Bar Plot"
+                        style="width: 100%; height: auto;">
+                    <figcaption>
+                        <strong>Figure.</strong> Bar plot showing the mutual-KNN kernel alignment metric before and
+                        after
+                        training for the linear (left) and MLP (right) adapters. For both adapter types and
+                        all encoders, kernel alignment to the DINOv2-small encoder improves after training with the
+                        dual encoder contrastive objective.
+                    </figcaption>
+                </figure>
+
+                <p>
+                    We use PCA to visualize the alignment process between the DINOv2-small embeddings and the aligned
+                    multimodal
+                    embeddings. First, we apply the DINOv2-small encoder to our test set and compute the principal
+                    components (PCs) of the resulting \(3200 \times 784\) matrix of embeddings. During training, at each
+                    epoch,
+                    we project the aligned multimodal embeddings onto the same PCs and plot the first two principal
+                    component
+                    scores for both sets of embeddings. This 2D visualization shows how the multimodal representations
+                    evolve
+                    to become more aligned with the DINOv2 embeddings.
+                </p>
+
+                <figure>
+                    <img src="figures/pca_alignment.svg" alt="PCA Alignment Visualization"
+                        style="width: 100%; height: auto;">
+                    <figcaption>
+                        <strong>Figure.</strong> PCA plots of the DINOv2 embeddings (blue) and aligned multimodal
+                        representations (yellow)
+                        at the first epoch (left) and last epoch (right) of training. The multimodal representations
+                        become
+                        progressively more aligned with the DINOv2 embeddings during training.
+                    </figcaption>
+                </figure>
+
+                <h3>Key Hypotheses Supported</h4>
+                    <p>
+                        Our results show that both the weak and strong hypotheses are supported. This indicates that the
+                        multimodal representations, which incorporate both image and text information, are more closely
+                        aligned
+                        with the DINOv2 embeddings than either the image or text representations alone.
+                    </p>
+
+                    <figure>
+                        <img src="figures/key_hypothesis_results.svg" alt="Key Hypothesis Results"
+                            style="width: 100%; height: auto;">
+                        <figcaption>
+                            <strong>Figure.</strong> The mutual-KNN kernel alignment metric for the aligned multimodal
+                            kernel
+                            surpasses both the average and the best of the unimodal kernels, supporting both the weak
+                            and
+                            strong hypotheses for both adapter types.
+                        </figcaption>
+                    </figure>
+
+                    <p>
+                        This result is particularly compelling given that DINOv2 is a self-supervised vision model
+                        trained
+                        <em>without any text supervision</em>. The fact that multimodal alignment with text leads to
+                        representations
+                        that are more similar to DINOv2, we believe, supports the <strong>Platonic Representation
+                            Hypothesis</strong> —
+                        suggesting a shared statistical model of reality across modalities.
+                    </p>
 
         </section>
 
@@ -729,7 +721,7 @@
                     suggests an underlying universality in representation spaces, supporting the PRH's notion of
                     convergence toward a shared statistical model of reality. The result is notable as it implies that
                     contrastive alignment between modalities — even when one modality was not part of the performant
-                    model’s training — can enhance representational alignment.
+                    model's training — can enhance representational alignment.
                 </li>
 
                 <li>
@@ -782,80 +774,6 @@
 
 
 
-        <!-- <section id="conclusion">
-            <h2>Conclusion</h2>
-            <p>
-                This work demonstrates that aligning pre-trained unimodal encoders using simple linear adapters into a
-                shared multimodal latent space effectively supports the Platonic Representation Hypothesis. By applying
-                a contrastive alignment objective, we show that the resulting multimodal representations achieve
-                improved kernel alignment with a performant model's embeddings, specifically DINOv2-small, surpassing
-                both image-only and text-only baselines. This suggests that such alignment can approximate a shared
-                statistical model of reality across modalities. Our approach, which decouples encoders and leverages
-                lightweight alignment, offers a scalable and modular foundation for efficient multimodal representation
-                learning and sets the stage for future research into richer multimodal datasets and additional
-                modalities.
-            </p>
-        </section> -->
-
-        <!-- <section id="discussion">
-            <h2>Discussion</h2>
-            <p>
-                In this project, we tested the Platonic Representation Hypothesis (PRH) by aligning pre-trained unimodal
-                representations from images and text into a shared multimodal latent space. Our framework leveraged
-                frozen encoders (ResNet-18 and DistilBERT) with lightweight linear and MLP adapters, trained using
-                contrastive learning to align the representations.
-            </p>
-
-            <h3>Multimodal Alignment and the Platonic Representation Hypothesis</h3>
-            <p>
-                Our findings demonstrate that contrastive alignment between image and text representations improves
-                their similarity to the DINOv2-small model, a high-performing self-supervised image encoder. This result
-                is particularly surprising given that DINOv2 was trained without any text data. The fact that aligning
-                image and text representations results in closer convergence to DINOv2 supports the PRH, suggesting a
-                shared statistical model of reality across modalities.
-            </p>
-
-            <h3>Empirical Validation of Key Hypotheses</h3>
-            <p>
-                We evaluated two key hypotheses: the weak hypothesis (aligned multimodal representations surpass the
-                average of unimodal alignments) and the strong hypothesis (aligned multimodal representations surpass
-                the best unimodal alignment). Both hypotheses were supported, indicating that the multimodal alignment
-                benefits from combining image and text modalities. This emergent behavior highlights that the whole
-                (multimodal representation) can be greater than its parts (unimodal representations).
-            </p>
-
-            <h3>Cross-Modality Benefits</h3>
-            <p>
-                The alignment process enables cross-modality benefits, particularly for text representations. Despite
-                DINOv2 being a vision-only model, the aligned multimodal representations incorporating text information
-                became more similar to DINOv2 embeddings. This suggests that multimodal alignment can unlock richer
-                representations, even for modalities not explicitly present during the performant model's training.
-            </p>
-
-            <h3>Limitations</h3>
-            <p>
-                One limitation of our study is the choice of dataset. The Flickr30k dataset primarily features images of
-                people performing everyday activities, which may constrain the diversity of the learned representations.
-                Expanding to datasets with broader content, such as COCO or OpenImages, could enhance the robustness of
-                the alignment.
-            </p>
-
-            <h3>Future Directions</h3>
-            <p>
-                Future work could explore integrating additional modalities, such as audio, to further test the
-                scalability of the alignment framework. Additionally, analyzing the internal mechanisms of convergence
-                and the role of adapter architecture may provide deeper insights into alignment-driven representation
-                learning.
-            </p>
-
-            <p>
-                Overall, our results highlight the potential of efficient, post hoc multimodal alignment in bridging the
-                gap between disparate unimodal representations and a unified, high-performing representation space.
-            </p>
-        </section> -->
-
-
-
         <section id="future-directions">
             <h2>Future Directions</h2>
 
@@ -898,15 +816,17 @@
             </p>
             <p>
                 \[
-                \mathcal{L}_{\text{multi}} = -\frac{1}{N} \sum_{i=1}^N \log \frac{\exp\left(\prod_{m=1}^M f_m^{(i)} /
-                \tau\right)}{\sum_{j=1}^N \exp\left(\prod_{m=1}^M f_m^{(j)} / \tau\right)},
+                \mathcal{L}_{\text{multi-encoder}} = -\frac{1}{N} \sum_{i=1}^N \log \frac{\exp\left( \sum_k
+                \prod_{m=1}^M
+                ( \mathbf{f_m^{(i)}} )_k /
+                \tau\right)}{\sum_{j=1}^N \exp\left(\sum_k \prod_{m=1}^M ( \mathbf{f_m^{(j)}} )_k / \tau\right)},
                 \]
             </p>
             <p>
-                where \( f_m \) represents the embeddings from the \( m \)-th modality encoder, and the product of
-                embeddings can be interpreted as a generalized <a
-                    href="https://math.stackexchange.com/questions/1137102/dot-product-for-3-vectors">Hadamard
-                    product</a>.
+                where \( ( \mathbf{f_m^{(i)}} )_k \) represents the \( k \)-th entry in the embeddings of the \( i
+                \)-th
+                data point produced by the \( m \)-th modality encoder, and \( \prod_{m=1}^M \) is an element-wise
+                product.
             </p>
             <p>
                 A potential challenge is that VGGSound provides video IDs and timestamps rather than direct downloads,
