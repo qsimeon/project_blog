@@ -488,6 +488,98 @@
                 MLP adapters can produce embeddings that not only match but exceed the performance of unimodal
                 representations when compared to a performant model like DINOv2.
             </p>
+
+            <details>
+                <summary>
+                    <strong>Bonus Experiment</strong>
+                </summary>
+                <h3>Downstream Classification Performance</h3>
+                <p>
+                    To evaluate the quality of our aligned representations in a downstream task setting, we conducted
+                    experiments on the
+                    CIFAR-10 image classification dataset. Our evaluation pipeline involved training linear classifiers
+                    on frozen features
+                    extracted from three models: DINOv2-small (our performant baseline), the unimodal ResNet-18 image
+                    encoder, and our
+                    aligned multimodal encoder.
+                </p>
+
+                <p>
+                    The classifiers were intentionally kept simple to evaluate the quality of the learned
+                    representations rather than
+                    the classification architecture. Each classifier consisted of a two-layer MLP with architecture:
+                </p>
+
+                <p>
+                    \[
+                    \text{Linear}(d_e \rightarrow 512) \rightarrow \text{ReLU} \rightarrow \text{Dropout}(0.1)
+                    \rightarrow
+                    \text{Linear}(512 \rightarrow 10)
+                    \]
+                </p>
+
+                <p>
+                    where \( d_e = 768 \) is the embedding dimension. The classifiers were trained for one epoch using
+                    the AdamW optimizer
+                    with a learning rate of \( 1 \times 10^{-3} \).
+                </p>
+
+                <h4>Results on CIFAR-10</h4>
+
+                <p>
+                    Our experiments with the linear adapter yielded the following results:
+                </p>
+                <ul>
+                    <li>DINOv2-small (baseline): 98.05% accuracy</li>
+                    <li>ResNet-18 image encoder: 77.84% accuracy (79.4% relative to DINOv2)</li>
+                    <li><strong>Aligned multimodal encoder: 75.69% accuracy (77.2% relative to DINOv2)</strong></li>
+                </ul>
+
+                <p>
+                    For the MLP adapter:
+                </p>
+                <ul>
+                    <li>DINOv2-small (baseline): 97.95% accuracy</li>
+                    <li>ResNet-18 image encoder: 74.91% accuracy (76.5% relative to DINOv2)</li>
+                    <li><strong>Aligned multimodal encoder: 72.21% accuracy (73.7% relative to DINOv2)</strong></li>
+                </ul>
+
+                <p>
+                    The linear adapter demonstrated marginally better performance, with both adapters showing similar
+                    patterns in their
+                    relative performance compared to DINOv2. Notably, while the aligned representations perform slightly
+                    below the
+                    unimodal image encoder (by approximately 2-3% absolute), they maintain strong relative performance
+                    compared to
+                    DINOv2 (>73% relative accuracy for both adapters).
+                </p>
+
+                <p>
+                    This minor performance gap is expected and can be interpreted positively: our aligned
+                    representations successfully
+                    maintain most of the task-relevant visual information while incorporating additional modalities,
+                    achieving 77.2%
+                    and 73.7% of DINOv2's performance for linear and MLP adapters respectively. This suggests that the
+                    alignment
+                    process preserves core visual features while potentially enriching the representation space with
+                    complementary
+                    information from the text modality.
+                </p>
+
+                <p>
+                    These results align with our kernel analysis findings, demonstrating that our aligned
+                    representations effectively
+                    capture meaningful visual features despite not being explicitly optimized for image classification.
+                    The fact that
+                    we can achieve >73% relative performance compared to a state-of-the-art vision model while
+                    incorporating text
+                    modality suggests that our alignment approach successfully balances modality-specific and shared
+                    information in
+                    the representation space.
+                </p>
+
+                <img src="figures/downstream_diagram.svg" alt="Downstream Classification Performance">
+            </details>
         </section>
 
         <section id="discussion">
