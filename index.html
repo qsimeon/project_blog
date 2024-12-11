@@ -495,11 +495,14 @@
                 adapters successfully bridge the gap between the modalities.
             </p>
 
-            <h3>Visualization of Alignment with PCA</h3>
+            <h3>Visualization of Alignment</h3>
             <p>
-                To further illustrate the alignment process, we apply PCA to visualize the embeddings produced by the
-                DINOv2-small encoder and our aligned multimodal encoder. We compute the principal components (PCs) of
-                the DINOv2-small embeddings and project the multimodal embeddings onto the same PCs.
+                To further illustrate the alignment process, we apply dimensionality reduction to visualize the
+                embeddings produced by
+                the DINOv2-small encoder and our aligned multimodal encoder. To explain using principal component
+                analysis (PCA), we compute the principal components (PCs) of the DINOv2-small embeddings and project the
+                multimodal embeddings onto the
+                same PCs. Multidimensional scaling (MDS) is a similar technique but nonlinear.
             </p>
 
             <p>
@@ -509,20 +512,15 @@
             </p>
 
             <figure>
-                <img src="figures/pca_alignment.jpg" alt="PCA Alignment Visualization"
+                <img src="figures/pca_alignment.jpg" alt="MDS Alignment Visualization"
                     style="width: 100%; max-width: 1200px; margin: 0 auto;">
                 <figcaption>
-                    <strong>Figure 4.</strong> PCA plots of the embeddings from the DINOv2-small encoder (blue) and our
+                    <strong>Figure 4.</strong> MDS plots of the embeddings from the DINOv2-small encoder (blue) and our
                     aligned multimodal encoder (yellow) at the first epoch (left) and last epoch (right) of training,
                     for both types of adapters: (A) linear and (B) MLP adapters. The multimodal representations become
                     progressively more aligned with the DINOv2 embeddings during training.
                 </figcaption>
             </figure>
-            <!-- <details>
-                <summary>Click to see alignment GIFs</summary>
-                <img src="figures/mlp_adapter.gif" alt="mlp_adapter.gif" style="width: 75%; height: auto;">
-                <img src="figures/linear_adapter.gif" alt="linear_adapter.gif" style="width: 75%; height: auto;">
-            </details> -->
 
             <h3>Key Hypotheses Supported</h3>
             <p>
