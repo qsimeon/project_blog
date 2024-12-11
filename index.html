@@ -84,35 +84,51 @@
         <section id="related-work">
             <h2>Related Work</h2>
             <p>
-                Our project builds on key advances in multimodal learning and theoretical insights:
+                Our project builds on several important advances in multimodal representation learning and theoretical
+                insights into model convergence:
             </p>
             <ol>
                 <li>
                     <strong><a href="https://phillipi.github.io/prh/">Platonic Representation Hypothesis
                             (PRH)</a>:</strong> <a href="https://arxiv.org/abs/2405.07987">Huh et al. (2024)</a>
-                    proposed that models converge toward a shared statistical reality. Our framework tests this by
-                    aligning unimodal encoders into a common latent space.
+                    proposed that
+                    performant models converge toward a shared statistical model of reality in their representation
+                    spaces,
+                    regardless of their training modality. This hypothesis underpins our framework, which aims to
+                    explicitly align unimodal encoders to test this convergence hypothesis.
                 </li>
                 <li>
                     <strong><a href="https://openai.com/index/clip/">CLIP</a>:</strong> <a
-                        href="https://arxiv.org/abs/2103.00020">Radford et al. (2021)</a> introduced joint multimodal
-                    representations using contrastive learning. Unlike CLIP, our method aligns frozen encoders post hoc,
-                    improving scalability.
+                        href="https://arxiv.org/abs/2103.00020">Radford et al. (2021) </a>introduced CLIP, a model that
+                    learns joint multimodal
+                    representations using contrastive learning on paired image-text datasets. CLIP's success
+                    demonstrates the power of cross-modal embeddings but requires joint training of encoders, which our
+                    framework aims to circumvent.
                 </li>
                 <li>
-                    <strong>Linear Mapping for Cross-Modal Tasks:</strong> <a
-                        href="https://arxiv.org/abs/2209.15162">Merullo et al. (2022)</a> showed that simple linear
-                    adapters can align visual and text representations, inspiring our lightweight adapter approach.
+                    <strong>Linear Mapping from Image to Text Space:</strong> <a
+                        href="https://arxiv.org/abs/2209.15162">Merullo et al. (2022)</a> showed that
+                    simple linear transformations can align visual representations to text spaces, enabling cross-modal
+                    tasks
+                    like visual question answering. Their findings inspired our use of linear and lightweight MLP
+                    adapters for multimodal alignment.
                 </li>
                 <li>
                     <strong>DINOv2:</strong> <a href="https://arxiv.org/abs/2304.07193">Oquab et al. (2023)</a>
-                    introduced DINOv2, a vision transformer producing robust embeddings. We use DINOv2-small as a
-                    benchmark for evaluating our aligned representations.
+                    introduced DINOv2, a self-supervised vision transformer
+                    model that generates robust embeddings. As our performant reference model, we use DINOv2-small to
+                    provide a benchmark for evaluating the quality of our aligned multimodal representations.
                 </li>
                 <li>
-                    <strong>Contrastive Learning Theory:</strong> <a href="https://arxiv.org/abs/2005.10242">Wang and
-                        Isola (2020)</a> provided insights into contrastive objectives, informing our use of
-                    dual-encoder contrastive loss to drive alignment.
+                    <strong>Contrastive Representation Learning:</strong>
+                    <a href="https://arxiv.org/abs/2005.10242">Wang and Isola (2020)</a> provided theoretical
+                    insights into
+                    contrastive learning by analyzing alignment and uniformity on the hypersphere. Their work shows that
+                    contrastive
+                    objectives promote both alignment of positive pairs and uniformity of representations across the
+                    hypersphere.
+                    This analysis informs our use of the <strong>dual-encoder contrastive loss</strong> to drive
+                    convergence in the shared latent space.
                 </li>
             </ol>
         </section>
