@@ -51,9 +51,11 @@
                     style="width: 100%; max-width: 1200px; margin: 0 auto;">
                 <figcaption>
                     <strong>Figure 1.</strong> Conceptual illustration of our multimodal alignment framework.
-                    Representations from ResNet-18 (images) and DistilBERT (text) are aligned using lightweight
-                    adapters. Matching image-caption pairs are pulled together, while non-matching pairs are pushed
-                    apart.
+                    Representations from ResNet-18 (images) and DistilBERT (text) on the image-caption samples from the
+                    Flickr30k dataset are aligned into a shared latent space using lightweight adapters. Matching
+                    image-caption pairs are
+                    pulled together, while non-matching pairs are pushed
+                    apart to create a unified multimodal embedding.
                 </figcaption>
             </figure>
         </section>
@@ -168,16 +170,18 @@
             </p>
             <p>
                 \[
-                \mathcal{D}_\text{world} = \left\{\left(\theta^{(i)}, \psi^{(i)}, \phi^{(i)}, \dots
-                \right)\right\}_{i=1}^N, \quad \theta \in \mathcal{\Theta}, \psi \in \mathcal{\Psi}, \phi \in
+                \mathcal{D}_\text{world} = \left\{\left(\theta^{(i)}, \psi^{(i)}, \phi^{(i)},
+                \dots\right)\right\}_{i=1}^N, \quad \theta \in \mathcal{\Theta}, \psi \in \mathcal{\Psi}, \phi \in
                 \mathcal{\Phi}, \dots
                 \]
             </p>
             <p>
                 where \( \mathcal{\Theta}, \mathcal{\Psi}, \mathcal{\Phi} \) represent different modalities (e.g.,
-                image, text, audio), and \( \theta, \psi, \phi \) are specific instances of these modalities. For
-                simplicity, we focus on a two-modality setting with images (\( \mathcal{X} \)) and text (\( \mathcal{Y}
-                \)):
+                image, text, audio), and \( \theta, \psi, \phi \) are specific instances of these modalities.
+            </p>
+            <p>
+                For simplicity, we focus on a two-modality setting with images (\( \mathcal{X} \)) and text (\(
+                \mathcal{Y} \)):
             </p>
             <p>
                 \[
@@ -192,7 +196,8 @@
                     <strong>Figure 2.</strong> Conceptual illustration of the connection between the Platonic
                     Representation Hypothesis (PRH) and our project framework. Representations from different modalities
                     (e.g., images, text) are hypothesized to converge toward a shared statistical model — the Platonic
-                    representation.
+                    representation. Our framework uses contrastive learning to
+                    explicitly align these representations into a shared latent space, approximating this convergence.
                 </figcaption>
             </figure>
 
@@ -210,8 +215,8 @@
                 where \( d_x \) and \( d_y \) are the embedding dimensions for images and text, respectively. We employ:
             </p>
             <ul>
-                <li><strong>ResNet-18</strong> trained on ImageNet1K for images (\(d_x = 512\)).</li>
-                <li><strong>DistilBERT</strong> trained on BookCorpus for text (\(d_y = 768\)).</li>
+                <li><strong>ResNet-18</strong> trained on ImageNet1K for images (\( d_x = 512 \)).</li>
+                <li><strong>DistilBERT</strong> trained on BookCorpus for text (\( d_y = 768 \)).</li>
             </ul>
             <p>
                 To project these into a shared latent space \( \mathbb{R}^{d_e} \), we introduce adapters:
@@ -261,9 +266,55 @@
                 </figure>
             </details>
 
-            <h3>Kernel Alignment Metric</h3>
-
             <p>
+                Typically, contrastive learning applies to different "views" generated through transformations
+                or augmentations of samples from a <em>single modality</em>. In our approach, we generalize this concept
+                by treating <em>different modalities</em> (image and text) as distinct views of a
+                <strong>hypothesized common underlying reality</strong>, inspired by the Platonic Representation
+                Hypothesis.
+            </p>
+
+            <h3>Connection to the Platonic Representation Hypothesis</h3>
+            <p>
+                The <strong>Platonic Representation Hypothesis (PRH)</strong> posits that representations from different
+                modalities converge toward a shared Platonic representation. In our framework, we hypothesize that
+                <strong>contrastive alignment</strong> between the unimodal image and text encoders drives this
+                convergence.
+            </p>
+            <p>
+                Our aligned multimodal encoder is defined as:
+            </p>
+            <p>
+                \[
+                h_\text{multi}(x, y) = \lambda \cdot f_{\text{image}}(x) + (1 - \lambda) \cdot g_{\text{text}}(y),
+                \]
+            </p>
+            <p>
+                where \( \lambda \) is a learnable parameter controlling the balance between the two modalities.
+            </p>
+
+            <h3>Performant Model Benchmark</h3>
+            <p>
+                To evaluate the quality of our aligned multimodal representations, we use the
+                <strong>DINOv2-small</strong> encoder as a benchmark. Specifically, we define the function implemented
+                by the DINOv2-small feature extractor as:
+            </p>
+            <p>
+                \[
+                \text{DINOv2}: \mathcal{X} \rightarrow \mathbb{R}^{d_e}.
+                \]
+            </p>
+            <p>
+                The DINOv2 encoder serves as a performant reference model, providing high-quality image representations.
+                By comparing our aligned multimodal representations to the DINOv2 representations, we measure how
+                effectively our contrastive alignment approximates this benchmark.
+            </p>
+
+            <h3>Kernel Alignment Metric</h3>
+            <p>
+                We characterize representations in terms of their <strong>kernels</strong>, which capture the similarity
+                between data points. Two representations are considered <strong>aligned</strong> if their kernels are
+                similar for corresponding inputs.
                 Given the kernels:
             </p>
             <ul>
@@ -275,7 +326,7 @@
             </ul>
 
             <p>
-                We evaluate alignment performance using the <strong>mutual-KNN kernel alignment metric</strong> \( m \).
+                we evaluate alignment performance using the <strong>mutual-KNN kernel alignment metric</strong> \( m \).
             </p>
 
             <p>
@@ -295,6 +346,11 @@
                         h_\text{multi} \) kernel with the DINOv2 kernel.</li>
                 </ul>
             </ul>
+
+            <p>
+                We conjecture that the aligned multimodal kernel will have higher similarity with \( K_{\text{DINOv2}}
+                \) than the unimodal kernels.
+            </p>
 
 
         </section>
@@ -386,8 +442,8 @@
             <h3>Evaluation Metrics</h3>
 
             <p>
-                We will test <strong>two key hypotheses</strong> based on the metrics we described in the Mathematical
-                Framework:
+                We will test <strong>two key hypotheses</strong> based on the mutual-kNN values we
+                described in the Mathematical Framework, before and after training:
             </p>
 
             <ul>
