@@ -20,18 +20,31 @@
         <section id="introduction">
             <h2>Introduction</h2>
             <p>
-                Deep learning models transform raw data into task-specific representations. Recently, two key research
-                areas have deepened our understanding of these representations. The <strong>CLIP framework</strong>
-                demonstrated the power of aligning image and text representations via paired data. The <strong>Platonic
-                    Representation Hypothesis</strong> posits that well-performing models converge toward a shared
-                statistical model of reality in their latent spaces.
+                Deep learning models are typically trained to transform raw data into representations optimized for
+                specific tasks. Recently, two lines of research have inspired a deeper inquiry into the nature of these
+                representations. The <strong>CLIP framework</strong> demonstrated the utility of aligning
+                representations across
+                modalities, using paired image-text data to train joint embeddings for cross-modal retrieval. Meanwhile,
+                the <strong>Platonic Representation Hypothesis</strong> posits that performant models converge toward a
+                shared
+                statistical model of reality in their representation spaces, suggesting a potential universality
+                underlying learned representations.
             </p>
             <p>
-                This project bridges these ideas by exploring whether representations from pre-trained unimodal neural
-                networks (e.g., ResNet-18 for images and DistilBERT for text) can be aligned into a shared multimodal
-                latent space. Inspired by CLIP's joint embedding approach and the Platonic Representation Hypothesis, we
-                use frozen encoders with lightweight adapters to achieve alignment without retraining larger models like
-                DINOv2. This enables efficient scalability to new modalities.
+                This project bridges these ideas by exploring whether representations from disparate pre-trained
+                unimodal neural networks can be aligned into a shared multimodal latent space, inspired by the joint
+                embedding approach of CLIP and motivated by the convergence hypothesis of Platonic Representations. The
+                proposed framework uses frozen unimodal encoders with learned linear adapters to align representations
+                across modalities. Our aim is to determine if such aligned representations better approximate those of
+                larger, more performant models.
+            </p>
+            <p>
+                Inspired by the success of CLIP in aligning representations across modalities and the theoretical
+                insights of the Platonic Representation Hypothesis, we propose a framework that aligns pre-trained
+                unimodal encoders into a shared multimodal latent space using simple linear adapters. By leveraging
+                frozen encoders such as ResNet-18 for images and DistilBERT for text, we aim to achieve alignment
+                without retraining a larger state-of-the-art model like DINOv2, enabling scalability to new modalities
+                with minimal overhead.
             </p>
             <figure>
                 <img src="figures/conceptual_contrastive.jpg" alt="Conceptual Multimodal Alignment"
@@ -659,14 +672,13 @@
             <h3>Conclusion</h3>
 
             <p>
-                Our results demonstrate that multimodal alignment via contrastive learning is a scalable and efficient
-                method for representation learning. The observed convergence toward DINOv2 embeddings supports the
-                idea of a <strong>universal Platonic representation</strong>, where aligning multiple modalities reveals
-                shared structures in representation spaces. This work builds on insights from the <strong>CLIP
-                    framework</strong>
-                and the <strong>Platonic Representation Hypothesis</strong>, highlighting the potential of multimodal
-                alignment
-                in advancing representation learning.
+                Our work demonstrates that multimodal alignment via contrastive learning is a promising
+                approach for achieving efficient, scalable representation learning. The observed convergence toward
+                DINOv2 embeddings supports the notion of a <strong>universal Platonic representation</strong>, where
+                aligning multiple modalities reveals shared underlying structures in representation spaces. This result
+                builds upon insights from both the <strong>CLIP framework</strong> and the <strong>Platonic
+                    Representation Hypothesis</strong>, underscoring the potential of multimodal alignment in advancing
+                our understanding of representation learning.
             </p>
         </section>
 
