@@ -424,7 +424,7 @@
 
             <h3>Training Procedure</h3>
             <p>
-                We train the adapters using the dual-encoder contrastive loss for <strong>15 epochs</strong> on
+                We train the adapters using the dual-encoder contrastive loss for <strong>100 epochs</strong> on
                 Flickr30k with a temperature parameter \( \tau = 0.07 \). Key hyperparameters:
             </p>
             <ul>
@@ -437,6 +437,29 @@
             <details>
                 <summary><em>Expand for schematic of training pipeline.</em></summary>
                 <img src="figures/training_pipeline.svg" alt="Training Pipeline" style="width: 100%; max-width: 800px;">
+            </details>
+
+            <h3>Training Procedure</h3>
+            <p>
+                We train the adapters to align image and text representations using the dual-encoder
+                contrastive loss.
+                Both <strong>linear </strong> and <strong>2-layer MLP</strong> adapters are trained for <strong>100
+                    epochs</strong> on the <strong>Flickr30k</strong> dataset
+                using a temperature scaling value of \( \tau = 0.02 \) in the contrastive loss. Other releavnt
+                hyperparameter settings are:
+            </p>
+
+            <ul>
+                <li><strong>Optimizer:</strong> AdamW</li>
+                <li><strong>Learning Rate:</strong> \(1 \times 10^{-4}\) (cosine decay with warmup).</li>
+                <li><strong>Gradient Clipping:</strong> 0.5.</li>
+                <li><strong>Weight Decay:</strong> 0.001 (linear adapter) and 0.005 (MLP adapter).</li>
+                <li><strong>Label Smoothing:</strong> 0.05.</li>
+                <li><strong>Dropout:</strong> 0.1.</li>
+            </ul>
+            <details>
+                <summary><em>Expand for schematic of training pipeline.</em></summary>
+                <img src="figures/training_pipeline.svg" alt="Training Pipeline">
             </details>
 
             <h3>Evaluation Metrics</h3>
