@@ -415,7 +415,7 @@
                 </li>
                 <li><strong>Adapters:</strong>
                     <ul>
-                        <li>Linear Adapter: \( W_x \) and \( W_y \).</li>
+                        <li>Linear Adapter: Matrix multiplication by \( W_x \) or \( W_y \) plus bias term.</li>
                         <li>MLP Adapter: 2-layer MLP with GELU and LayerNorm.</li>
                     </ul>
                 </li>
@@ -425,7 +425,7 @@
             <h3>Training Procedure</h3>
             <p>
                 We train the adapters using the dual-encoder contrastive loss for <strong>100 epochs</strong> on
-                Flickr30k with a temperature parameter \( \tau = 0.02 \) in the contrastive loss. Other releavnt
+                Flickr30k with a temperature parameter \( \tau = 0.02 \) in the contrastive loss. Other relevant
                 hyperparameter settings:
             </p>
 
